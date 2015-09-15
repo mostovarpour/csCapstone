@@ -1,18 +1,18 @@
 # csCapstone
 Northern Arizona University Senior Capstone 
 
-Matthew Ostovarpour
+1. Matthew Ostovarpour
 
-Email: matto@nau.edu
+  Email: matto@nau.edu
 
-Daniel Garcia-Briseno
+2. Daniel Garcia-Briseno
 
-Email: dg538@nau.edu
+  Email: dg538@nau.edu
 
-TJ O'Brien
+3. TJ O'Brien
 
-Email: tjo56@nau.edu
+  Email: tjo56@nau.edu
 
-Doug Peterson
+4. Doug Peterson
 
-Email dep64@nau.edu
+  Email dep64@nau.edu
