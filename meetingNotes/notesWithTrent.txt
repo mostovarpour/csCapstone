@@ -1,0 +1,57 @@
+Extension of last year's project
+
+Using with GDAL, it is a rastor engine
+Also includes scientific data not just camera images
+Trent showed is the size of an image if it was going to be printed out.
+    -Some images are 1 Terabyte in size
+    -Trent does not like having to split images up into thousands or millions of different images
+    -Stacks of resolutions end up in tiny 512x512 images
+    -Tile caches are 
+
+planetary GIS is Trent's website (one of them)
+    -Trent builds his images in layers
+    -To make imags draw faster you either make a mill8ion tiny little jpegs or you add 20% to the size of that image just to be able to view it
+    -Take that same image and randomly sample into that you would be able to draw it really quickly
+    -The problem is that even the biggest monitor (4k) the computer still has to dumb down a 100k image to fit on the screen
+    -A lot of the time Trent wants to just look at the image and see if his mosaic worked instead of waiting an hour for pyramids to build or waiting 20 minutes for the image to draw on the screen
+    -If it needs to be viewed over and over it will need to be optimised but if it just needs to be viewed once just use random sampling (for speed)
+
+    -GDAL is pretty easy to get and compile
+
+Our goal is to build a new reader
+GDAL is a library that has binary applications but really is a library to write to
+
+ISIS is the USGS's own image file format
+
+Trent is going to send us an email with different sized (probably 10 gig) images
+
+Need to ask Dr. Palmer if we are going to get access to last years team's code
+
+To get teh best results, the read process needs to be truly random
+Trent would like us to be able to tweak the library call to be able to tune between picure quality and compression speed
+
+Do not necessarily need to make a viewer. If we can get the reader into GDAL then TuiView can view the image for us
+
+Remember where you were (sort of) so that if you go back to that area then it if still in memory
+
+Most important is the reader!!! Not the gui
+
+Check out GDAL's virtual memory thing (Checks if something is already in memory)
+"Let GDAL do the dirty work." So we are going to use GDAL calls but modify them so that they do the random sampling
+
+If you find a no-data then you can not use it. May have to deal with no data problems.
+    -If you have to check each pixel to see if it is a no-data pixel that would slow everything much down
+
+google gdal trac, website is trac.osgea.org/gdal/wiki/SoftwareUsingGdal
+svn.osgeo.org/gdal/trunk/gdal ?
+There are a lot of good tutorials on how to code to GDAL
+
+QGIS is an open platforn viewing platform
+
+Lots of potential if we can get GDAL to view stuff faster
+
+"It would be hard to be GDAL when you get down to the pure level." 
+    -So use random reads to a certain level then use GDAL standard read
+
+
+Bottom line - Trent wants an approximation of what the image is going to look like and he does not want the whole image to be loaded in memory
