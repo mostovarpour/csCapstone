@@ -1,0 +1,40 @@
+Palmer made sure we talked with trent
+
+Wants us to communicate with Austin and Alex
+
+Possibly use tuiview or build off the last team's gui
+
+Difficulty with making the system run on windows
+
+We should look into BGFX. A cross platform graphics api that we may be able to use for making a 
+cross platform gui.
+
+PART 1
+  Make a Gui
+PART 2
+  Get the reader into GDAL
+
+Possibly after implementing the reader in gdal, tuiview may just work.
+
+May be easier to start the gui from scratch since tuiview is not built to up the resolution while idle
+
+GUI
+READER
+Different techniques for reading images.
+
+Smart sampling. If values are similar, chances are we are done sampling
+If values are crazy, then we should sample more.
+
+TODO
+Go over the old code base that we have to start with.
+Create gui with BGFX.
+Implement this code inside of GDAL.
+
+Get some proof of concepts done by the end of this semester to make sure that it's doable and we
+will then have a base for real production code next semester.
+
+Think scrum and agile.
+Tools for scrum and agile. (Trello)
+Using C allows us to integrate with python later on.
+
+Right now, get to know GDAL and our current codebase.
