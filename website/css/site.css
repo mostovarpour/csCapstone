@@ -1,4 +1,15 @@
+nav {
+    background: #ddd !important;
+}
+body {
+    background: #eee;
+}
 .footer {
     padding-left: 20px;
-    color: #aaa;
+    color: #666;
+}
+
+#jumbo-header {
+    color: white;
+    background-image: url("/images/mars.jpg");
 }

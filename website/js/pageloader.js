@@ -2,7 +2,8 @@
 $(document).ready(function () {
     getNav();
     getHeader();
-    getContent();
+    getTeam();
+    getProjectDetails();
     getFooter();
 });
 
@@ -12,9 +13,15 @@ function getNav() {
     })
 }
 
-function getContent() {
-    $.get('site-chunks/content.html').then(function (data) {
-        $('#main-content').html(data);
+function getTeam() {
+    $.get('site-chunks/team_info.html').then(function (data) {
+        $('#team-content').html(data);
+    })
+}
+
+function getProjectDetails() {
+    $.get('site-chunks/project_details.html').then(function (data) {
+        $('#project-content').html(data);
     })
 }
 
