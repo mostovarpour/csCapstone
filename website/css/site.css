@@ -11,5 +11,5 @@ body {
 
 #jumbo-header {
     color: white;
-    background-image: url("/images/mars.jpg");
+    background-image: url("../images/mars.jpg");
 }
