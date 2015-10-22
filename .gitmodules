@@ -1,6 +1,6 @@
 [submodule "bgfx/bx"]
 	path = bgfx/bx
-	url = https://github.com/bkaradzic/bx.git
+	url = https://github.com/razanix/bx.git
 [submodule "bgfx/bgfx"]
 	path = bgfx/bgfx
-	url = https://github.com/bkaradzic/bgfx.git
+	url = https://github.com/razanix/bgfx.git
