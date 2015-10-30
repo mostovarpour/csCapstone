@@ -25,7 +25,7 @@ INCLUDE = -I../bgfx/bx/include -I../bgfx/bgfx/include -I../bgfx/bgfx/3rdparty -I
 COMPILE = gcc $(DEFINES) $(CFLAGS) $(INCLUDE)
 
 # Flags for compiling and linking to our program
-LIBFLAGS =  -L./lib -m64 -Wl,--gc-sections ./lib/libbgfx64.a ./lib/libcommon64.a -lrt -ldl -lX11 -lGL -lpthread
+LIBFLAGS =  -L./lib -m64 -Wl,--gc-sections ./lib/bgfx/libbgfx64.a ./lib/bgfx/libcommon64.a -lrt -ldl -lX11 -lGL -lpthread
 LINK = $(foreach object, $(FILES), $(OBJPATH)/$(object).o)
 
 all:

@@ -1,7 +1,9 @@
 Debug
 Release
+Ubuntu/build
 *.user
 *.opensdf
 *.sdf
 *.suo
 *.filters
+.ycm_extra_conf.py
