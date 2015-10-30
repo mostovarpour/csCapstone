@@ -4,7 +4,7 @@
  */
 
 #include <bgfx/c99/bgfx.h>
-#include "headers\logo.h"
+#include "headers/logo.h"
 
 extern bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset);
 
