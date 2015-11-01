@@ -5,6 +5,7 @@
 
 #include <bgfx/c99/bgfx.h>
 #include "headers/logo.h"
+#include "headers/config.h"
 
 extern bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset);
 
@@ -18,16 +19,17 @@ int _main_(int _argc, char** _argv)
 	uint32_t width  = 1280;
 	uint32_t height = 720;
 	uint32_t debug  = BGFX_DEBUG_TEXT;
-	uint32_t reset  = BGFX_RESET_VSYNC;
+	uint32_t reset  = RESET_PARAMS;
 	(void)_argc;
 	(void)_argv;
 
-	bgfx_init(BGFX_RENDERER_TYPE_COUNT
-			, BGFX_PCI_ID_NONE
-			, 0
-			, NULL
-			, NULL
-			);
+
+	bgfx_init(  RENDER_TYPE  // defined in config.h, Direct3D12 for windows and OpenGL on other systems
+                    , BGFX_PCI_ID_NONE // Autoselect gpu vendor
+                    , 0 // use default gpu...
+                    , NULL // Callback interface that handles events. We'll probably set this later
+                    , NULL // allocator? I hope we can leave this null
+                    );
 	bgfx_reset(width, height, reset);
 
 	// Enable debug text.
