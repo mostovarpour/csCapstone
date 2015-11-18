@@ -1,0 +1,29 @@
+Slides:
+    -Don't start with our project start with the problem
+    -Start with the problem and than think "Why is this an important problem"
+    -Needs more images, replace images that represent ideas instead of using text
+    -Dr. Palmer likes the math idea there is just too many words part
+        -Try to make it just 3 or 4 lines and then we talk about the commentary
+    -Do not mention stochastic sampling until we say what it is
+    -After the average downsampling slide talk about how stochastic sampling 
+    -GDAL slide should be one of the goals at the very beginning
+        -Should not go too much into depth about what GDAL is but still need to 
+         explain what it is
+    -Need a problem statement
+    -Google open source gant chart
+    -Do not say that we are working on a GUI, say that we are working on 
+     a real-time version of the algorithm, should be part of problem statement
+    -We have two main problems, the real-time interactive version and the 
+     non interactive version
+    -Take a cue for GDAL from the official GDAL website
+    -GDAL is the swiss army knife of reading and manipulating rastor and image data
+    -Emphasize that GDAL is what everybody uses
+        -Used by Google maps, NASA, USGS, anyone who uses 
+    -Good conclusion slide
+        -Have an image on final slide
+        -Make it a cool one
+        -Conclusion should mostly summarize the motivation
+            -What was problem question
+            -How are we going to solve it
+            -Convince everyone how marvalous what we are going to do is and 
+             how it will solve world hunger
