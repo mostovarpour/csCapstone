@@ -6,7 +6,7 @@ PROGRAM_NAME = gdalViewer
 # These are the files that will be compiled. If it needs any extra compiler flags then either add them
 # the flags to CFLAGS or manually add a compiler call above the g++ linking also make sure it's added into
 # the g++ linking call. Ask Daniel for help if needed
-FILES = helloworld
+FILES = helloworld sampler
 
 
 
@@ -25,11 +25,11 @@ INCLUDE = -I../bgfx/bx/include -I../bgfx/bgfx/include -I../bgfx/bgfx/3rdparty -I
 COMPILE = gcc $(DEFINES) $(CFLAGS) $(INCLUDE)
 
 # Flags for compiling and linking to our program
-LIBFLAGS =  -L./lib -m64 -Wl,--gc-sections ./lib/bgfx/libbgfx64.a ./lib/bgfx/libcommon64.a -lrt -ldl -lX11 -lGL -lpthread
+LIBFLAGS =  -L./lib -m64 -Wl,--gc-sections ./lib/bgfx/libbgfx64.a ./lib/bgfx/libcommon64.a -lrt -ldl -lX11 -lGL -lpthread -lgdal
 LINK = $(foreach object, $(FILES), $(OBJPATH)/$(object).o)
 
 all:
 	mkdir -p build/bin
 	mkdir -p build/obj
-	$(foreach file, $(FILES), $(COMPILE) -o $(OBJPATH)/$(file).o -c $(SRCPATH)/$(file).c)
+	$(foreach file, $(FILES), $(COMPILE) -o $(OBJPATH)/$(file).o -c $(SRCPATH)/$(file).c;)
 	g++ -o ./build/bin/$(PROGRAM_NAME) $(LINK) $(LIBFLAGS)
