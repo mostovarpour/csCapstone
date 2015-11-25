@@ -1,24 +1,27 @@
-Talk about our three major points
-    Tuning last year's project
-    Reducing current sampling times?
-    building a more useable gui?
+- Talk about our three major points
+    - Tuning last year's project
+    - Reducing current sampling times?
+    - building a more useable gui?
 
-    Probably put these at the beginning of the presentation
+    - Probably put these at the beginning of the presentation
 
-Get rid of the pyramid sampling slide
-Talk about random sampling more
-Discuss requirements aquisition
-    Go into a medium amount of detail about this
-be more clear
-memorize lines, no note cards
-Dr. Vanderburg liked that we corrected eachother to provide the correct information
-Maybe a little bit more about requirements
+- Get rid of the pyramid sampling slide
+- Get rid of the white slide with the comic on it (I already did this)
+- Talk about random sampling more
+- Discuss requirements aquisition
+    - Go into a medium amount of detail about this
+- be more clear
+- memorize lines, no note cards
+- Dr. Vanderburg liked that we corrected eachother to provide the correct information
+- Maybe a little bit more about requirements
 
-Don't waste any space on slides but don't clutter them either
-Include more concrete points, also need to explain things more
-Really need to talk about requirements more
-need to add something during winter break for the schedule
-Make sure that what we say matches what is on the slide
+- Don't waste any space on slides but don't clutter them either
+- Include more concrete points, also need to explain things more
+- Really need to talk about requirements more
+- need to add something during winter break for the schedule
+- Make sure that what we say matches what is on the slide
 
-talk about project scope
-    seperate the big issue into several smaller issues
+- talk about project scope
+    - seperate the big issue into several smaller issues
+
+- Possibly introduce ourselves at the beginning of the presentation and our job titles
