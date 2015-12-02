@@ -607,7 +607,15 @@ void callocVisibleTiles(int numXTiles, int numYTiles, int originalBlockSize, int
 	}
 }
 
-int main(void) {
+void checkParams(int argc, char **argv) {
+    if(argc > 1) {
+        filepath = argv[1];
+    }
+}
+
+int main(int argc, char **argv) {
+    checkParams(argc, argv);
+    printf("%s\n", filepath);
   
    GLuint index_buffer;
 
