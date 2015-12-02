@@ -73,42 +73,42 @@ static const GLfloat squareTexCoords[] = {
 void tweenIn(){
 	while (zoomLevel < dZoomLevel){
 		zoomLevel += (.001) * zoomLevel/10;
-		Sleep(1);
+		sleep(1);
 	}	
 }
 
 void tweenOut(){
 	while (zoomLevel > dZoomLevel){
 		zoomLevel -= (.001) * zoomLevel/10;
-		Sleep(1);
+		sleep(1);
 	}	
 }
 
 void tweenPanUp(){
 	while(verticalOffset > dVerticalOffset){
 		verticalOffset -= (.001 / zoomLevel);
-		Sleep(3);
+		sleep(3);
 	}
 }
 
 void tweenPanDown(){
 	while(verticalOffset < dVerticalOffset){
 		verticalOffset += (.001 / zoomLevel);
-		Sleep(3);
+		sleep(3);
 	}
 }
 
 void tweenPanLeft(){
 	while(horizontalOffset < dHorizontalOffset){
 		horizontalOffset += (.001 / zoomLevel);
-		Sleep(3);
+		sleep(3);
 	}
 }
 
 void tweenPanRight(){
 	while(horizontalOffset > dHorizontalOffset){
 		horizontalOffset -= (.001 / zoomLevel);
-		Sleep(3);
+		sleep(3);
 	}
 }
 
@@ -744,7 +744,6 @@ int main(void) {
   int threadID;
 	
 	currentlySampling = 1;
-        pthread_t thread;
         pthread_t thread;
         pthread_create(&thread, NULL, &sample, mLod[currentLOD-1]);
   /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sample, mLod[currentLOD-1], 0, &threadID);*/
