@@ -31,11 +31,11 @@ SVImage init(int xLow, int xHigh, int yLow, int yHigh, const char *filepath){
     int origBandCount;
     
     /*Get some information on the image*/
-    origWidth = GDALGetRasterXSize( hDataset );           // Get raster pixel width
-    origHeight = GDALGetRasterYSize( hDataset );          // Get raster pixel height
-    origBandCount = GDALGetRasterCount( hDataset ); // Get number of raster bands in the image
-    GDALRasterBandH hBand = GDALGetRasterBand( hDataset, 1 ); // Get raster band with id 1
-    GDALGetBlockSize( hBand, xBlockSize, yBlockSize);         // Fetch the block size for this band
+    origWidth = GDALGetRasterXSize( hDataset );                 // Get raster pixel width
+    origHeight = GDALGetRasterYSize( hDataset );                // Get raster pixel height
+    origBandCount = GDALGetRasterCount( hDataset );             // Get number of raster bands in the image
+    GDALRasterBandH hBand = GDALGetRasterBand( hDataset, 1 );   // Get raster band with id 1
+    GDALGetBlockSize( hBand, xBlockSize, yBlockSize);           // Fetch the block size for this band
 
     /*TODO make sure scale is set somewhere*/
     
