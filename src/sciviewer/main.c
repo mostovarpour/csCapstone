@@ -1,9 +1,4 @@
-#define GLFW_INCLUDE_ES2 1
-#define GLFW_DLL 1
-
-
 char* filepath = "/home/leah/Pictures/mars.tif";
-//char* filepath = "D:\\CubFiles\\lunar.cub";
 int currentlySampling = 0;
 int resampled = 0;
 
@@ -17,8 +12,8 @@ static float dHorizontalOffset = 0.0;
 static int numLevels = 6;
 static int currentLOD = 5;
 
-
-#include <GLES2/gl2.h>
+ 
+#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -113,27 +108,24 @@ void tweenPanRight(){
 }
 
 char* raster_vertex_shader_src =
-  "attribute vec4 Position1;\n"
-  "attribute vec2 SourceColor1;\n"
-  "\n"
-  "varying vec2 DestinationColor1;\n"
-  "uniform float zoomLevel;\n"
-  "uniform float verticalOffset;\n"
-  "uniform float horizontalOffset;\n"
-  "\n"
-  "void main(void) {\n"
-  "    gl_Position = vec4((vec2((Position1[0] + horizontalOffset), (Position1[1] + verticalOffset))),Position1[2], (1.0 / zoomLevel));\n"
-  "    DestinationColor1 = SourceColor1 ;\n" 
-  "}\n";
+  "attribute vec4 Position1;"
+  "attribute vec2 SourceColor1;"
+  "varying vec2 DestinationColor1;"
+  "uniform float zoomLevel;"
+  "uniform float verticalOffset;"
+  "uniform float horizontalOffset;"
+  "void main(void) {"
+  "    gl_Position = vec4((vec2((Position1[0] + horizontalOffset), (Position1[1] + verticalOffset))),Position1[2], (1.0 / zoomLevel));"
+  "    DestinationColor1 = SourceColor1 ;" 
+  "}";
 
 char* raster_fragment_shader_src =
-  "precision highp float;\n"
-  "uniform sampler2D texture;\n"
-  "varying lowp vec2 DestinationColor1;\n"
-  "\n"
-  "void main(void) {\n"
-  "    gl_FragColor = texture2D(texture, vec2(DestinationColor1[0], 1.0-DestinationColor1[1]));\n"
-  "}\n";
+  /*"precision highp float;"*/
+  "uniform sampler2D texture;"
+  "varying vec2 DestinationColor1;"
+  "void main(void) {"
+  "    gl_FragColor = texture2D(texture, vec2(DestinationColor1[0], 1.0-DestinationColor1[1]));"
+  "}";
 
   
   GLint simple_shader(GLint shader_type, char* shader_src) {
@@ -631,7 +623,7 @@ int main(int argc, char **argv) {
   int resWidth = res->width;
 	
   glfwDefaultWindowHints();
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
