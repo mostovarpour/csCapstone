@@ -1,24 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <string.h>
-#include "lod2.c"
-//#include <unistd.h>
-
-
-//GDAL includes:
-//---------------------------------------------
-#include "gdal.h"
-#include "cpl_conv.h" /* for CPLMalloc() */
-//---------------------------------------------
-
+#include "headers/probabilistic.h"
 int scale;  //data reduction scale.  We are creating a 1:Scale representation of the image.
 
 /*
 Uses stochastic sampling to fill the data section of an SVImage struct.
 */
 
-void sample(LevelOfDetail* in){		//TODO handle 32 bit representations
+void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
 	int* xLow = malloc(sizeof(int));
 	int* xHigh = malloc(sizeof(int));
 	int* yLow = malloc(sizeof(int));

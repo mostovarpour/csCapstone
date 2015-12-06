@@ -1,20 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <GLES2/gl2.h>
-#include <GLFW/glfw3.h>
-#include "SV.h"
-#include "gdal.h"
-#include "cpl_conv.h"
+#include "headers/lod2.h"
 
 static int r = 0;
-
-void initLevelOfDetail(int tiles, LevelOfDetail* lod);
-int getNumLevels();
-void initLODSVImage(LevelOfDetail *lod, int numTiles);
-extern char* filepath;
-
-//void sample(int numTiles, LevelOfDetail* lod);
-
 
 LevelOfDetail** initLODArray(int numLevels, int numTiles){
 	LevelOfDetail** mLod;
@@ -35,7 +21,6 @@ LevelOfDetail** initLODArray(int numLevels, int numTiles){
 }
 
 void initLevelOfDetail(int numTiles, LevelOfDetail* lod){
-	int i;
 	//allocate space for array of SVImages (one space for each tile in the image)
 	lod->data = (SVImage**)malloc(sizeof(SVImage*) * numTiles);
 }

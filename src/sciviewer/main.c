@@ -1,6 +1,7 @@
 char* filepath = "/home/leah/Pictures/mars.tif";
 int currentlySampling = 0;
 int resampled = 0;
+extern int scale;
 
 static float dZoomLevel = 1.0;
 static float zoomLevel = 1.0;
@@ -18,9 +19,9 @@ static int currentLOD = 5;
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "SV.h"
-#include "probabilistic7.c"
-#include "ui_images.c"
+#include "headers/SV.h"
+#include "headers/probabilistic.h"
+#include "headers/ui_images.h"
 #include <pthread.h>
 
 
