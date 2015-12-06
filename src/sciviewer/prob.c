@@ -79,16 +79,18 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
     printf("numXBlocks = %i\n", numXBlocks);
     printf("numYBlocks = %i\n", numYBlocks);
 
-    if ((*xHigh < 0) || (*xHigh < *xLow)){
+    /*if ((*xHigh < 0) || (*xHigh < *xLow)){*/
         *xHigh = numXBlocks;
-    }
-    if ((*yHigh < 0)|| (*yHigh < *yLow)){
+    /*}*/
+    /*if ((*yHigh < 0)|| (*yHigh < *yLow)){*/
         *yHigh = numYBlocks;
-    }
+    /*}*/
 
-    int usedXBlocks = ((*xHigh) - (*xLow));
-    int usedYBlocks = ((*yHigh) - (*yLow));
-    int usedBlocks = (usedXBlocks * usedYBlocks);
+    /*
+     *int usedXBlocks = ((*xHigh) - (*xLow));
+     *int usedYBlocks = ((*yHigh) - (*yLow));
+     *int usedBlocks = (usedXBlocks * usedYBlocks);
+     */
 
     //unsigned char* output = CPLMalloc((sizeof(char) * xOutputSize* yOutputSize * (bandCount+1)));  // Allocate space for the output
     float* vals = calloc( xOutputSize* yOutputSize * (bandCount+1), sizeof(float));			//stores pixel values
@@ -100,8 +102,10 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
     unsigned long sampledIndex = 0;	//One dimensional representation of column/row index
     //iterate through each pixel, jump to the last pixel we sampled.
     long long i = 0;
-    long long e = 0;
-    int j;
+    /*
+     *long long e = 0;
+     *int j;
+     */
     printf("xLow: %i \n xHigh: %i \n yLow: %i\n yHigh: %i\n", *xLow, *xHigh, *yLow, *yHigh);
 
     /*
@@ -113,21 +117,23 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
     if (GDALGetRasterDataType(hBand) == GDT_Int16){	
         //TODO implement 16 bit
     }else{
-
-        unsigned char* data = (char *) CPLMalloc(sizeof(char) * (*xBlockSize)*(*yBlockSize));
-        int band = 1;
-        for (band; band <= bandCount; band++){
+        unsigned char* data = (unsigned char *) CPLMalloc(sizeof(char) * (*xBlockSize)*(*yBlockSize) * numXBlocks * numYBlocks);
+        int band;
+        for (band = 1; band <= bandCount; band++){
             hBand = GDALGetRasterBand( hDataset, band );
-            int yBlock = *yLow;
+            int yBlock;
             int xBlock;
-            for(yBlock; yBlock < *yHigh; yBlock++){
-                xBlock = *xLow;
-                //current yBlock (offset by lowest number of accessible y Blocks) * size of a block * number of used x Blocks * number of bands
-                //printf("%i\n",yBlock);
-                for(xBlock; xBlock < *xHigh; xBlock++){
+            for(yBlock = *yLow; yBlock < *yHigh; yBlock++){
+                for(xBlock = *xLow; xBlock < *xHigh; xBlock++){
+                    printf("xBlock: %d, xHigh: %d\n", xBlock, *xHigh);
                     //printf("%i\n",xBlock);
                     if(in->data[(yBlock * numXBlocks) + xBlock]->Sampled == 0){
-                        GDALReadBlock(hBand,xBlock,yBlock, data);
+                        printf("Reading Block x: %d y: %d\n", xBlock, yBlock);
+                        if(GDALReadBlock(hBand,xBlock,yBlock, data) == CE_Failure) {
+                            puts("Failed to read block");
+                            continue;
+                        }
+                        puts("Block read");
                         for(i=0 ; i < ((*xBlockSize)*(*yBlockSize)) ; i += rseed){
                             rseed = (214013 * rseed + 2531011);
                             rseed %= maxStride;	
@@ -166,7 +172,7 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
         }
     }
 
-    int currentlySampling = 0;
+    /*int currentlySampling = 0;*/
 
     printf("sampling complete\n");
     GDALClose(hDataset);
