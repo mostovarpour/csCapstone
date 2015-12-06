@@ -1,5 +1,5 @@
-//char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";
-char* filepath = "/media/matthew/raid5Array/capstone/mars.tif";
+char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";
+//char* filepath = "/media/matthew/raid5Array/capstone/mars.tif";
 extern int scale;
 int currentlySampling          = 0;
 int resampled                  = 0;
@@ -87,7 +87,7 @@ char* raster_fragment_shader_src =
 "}";
 
 
-GLint simple_shader(GLint shader_type, char* shader_src) {
+GLint simple_shader(GLint shader_type, const char* shader_src) {
     GLint compile_success = 0;
     int shader_id = glCreateShader(shader_type);
     glShaderSource(shader_id, 1, &shader_src, 0);
@@ -137,27 +137,27 @@ static void keyAction(GLFWwindow* window, int key, int scancode, int action, int
     if (key == 90){			//z key
         zoom(1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenIn, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenIn, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenIn, NULL);
     }else if (key == 88){	//x key
         zoom(-1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenOut, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenOut, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenOut, NULL);
     }else if (key == 73){	//i key
         panVertical(-.1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenPanUp, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenPanUp, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenPanUp, NULL);
     }else if (key ==74){    //j key
         panHorizontal(.1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenPanLeft, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenPanLeft, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenPanLeft, NULL);
     }else if (key ==75){    //k key
         panVertical(.1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenPanDown, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenPanDown, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenPanDown, NULL);
     }else if (key ==76){	//l key
         panHorizontal(-.1);
         /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)tweenPanRight, NULL, 0, NULL);*/
-        pthread_create(&thread, NULL, &tweenPanRight, NULL);
+        pthread_create(&thread, NULL, (void *)&tweenPanRight, NULL);
     }
 }
 
@@ -362,7 +362,7 @@ void resample(){
     int threadID;
     currentlySampling = 1;
     pthread_t thread;
-    pthread_create(&thread, NULL, &sample, lodArray[currentLOD]);
+    pthread_create(&thread, NULL, (void *)&sample, lodArray[currentLOD]);
     /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sample, lodArray[currentLOD], 0, &threadID);*/
     resampled = 1;
 }
@@ -468,7 +468,7 @@ void svGetVisibleTiles(int* xLowOut, int* xHighOut, int* yLowOut, int* yHighOut)
         tileWidth = (2.0/numXTiles);
         tileHeight = (2.0/numYTiles);
 
-        printf("tileWidth = %ld\n", tileWidth);
+        printf("tileWidth = %lf\n", tileWidth);
 
         float xMap = (vpXOffset + 1.000001);
         xMap = (xMap / tileWidth);
@@ -704,7 +704,7 @@ int main(int argc, char **argv) {
 
     currentlySampling = 1;
     pthread_t thread;
-    pthread_create(&thread, NULL, &sample, mLod[currentLOD-1]);
+    pthread_create(&thread, NULL, (void *)&sample, mLod[currentLOD-1]);
     /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sample, mLod[currentLOD-1], 0, &threadID);*/
 
     //Todo Create Function to init index buffer

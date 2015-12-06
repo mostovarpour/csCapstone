@@ -117,7 +117,7 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
     if (GDALGetRasterDataType(hBand) == GDT_Int16){	
         //TODO implement 16 bit
     }else{
-        unsigned char* data = (unsigned char *) CPLMalloc(sizeof(char) * (*xBlockSize)*(*yBlockSize) * numXBlocks * numYBlocks);
+        unsigned char* data = (unsigned char *) CPLMalloc(sizeof(char) * (*xBlockSize)*(*yBlockSize) * numXBlocks * numYBlocks*10);
         int band;
         for (band = 1; band <= bandCount; band++){
             hBand = GDALGetRasterBand( hDataset, band );
@@ -131,8 +131,12 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
                         printf("Reading Block x: %d y: %d\n", xBlock, yBlock);
                         if(GDALReadBlock(hBand,xBlock,yBlock, data) == CE_Failure) {
                             puts("Failed to read block");
+                            //Testing
+                            puts("Made it this far...\n");
                             continue;
                         }
+                        //Testing
+                        puts("Made it this far...\n");
                         puts("Block read");
                         for(i=0 ; i < ((*xBlockSize)*(*yBlockSize)) ; i += rseed){
                             rseed = (214013 * rseed + 2531011);
@@ -146,6 +150,8 @@ void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
                             valsPerIndex[outIndex] +=1;
                         }
 
+                        //Testing
+                        puts("Made it this far...\n");
                         for (i=0; i< ( xOutputSize* yOutputSize* (bandCount+1)); i+=4){
                             //output[i] = (unsigned char) (vals[i]/valsPerIndex[i]);	//calculate final output by averaging each color value
                             in->data[(yBlock * numXBlocks) + xBlock]->Data[i+ (band-1)] = (unsigned char) (vals[((i/4))]/valsPerIndex[((i/4))]);
