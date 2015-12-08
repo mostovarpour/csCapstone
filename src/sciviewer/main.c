@@ -1,5 +1,6 @@
-char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";
+/*char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";*/
 //char* filepath = "/media/matthew/raid5Array/capstone/mars.tif";
+char* filepath = "/home/leah/Pictures/mars.tif";
 extern int scale;
 int currentlySampling          = 0;
 int resampled                  = 0;
@@ -362,7 +363,11 @@ void resample(){
     int threadID;
     currentlySampling = 1;
     pthread_t thread;
-    pthread_create(&thread, NULL, (void *)&sample, lodArray[currentLOD]);
+    sample_parameters params;
+    params.filepath = filepath;
+    params.lod = lodArray[currentLOD];
+    puts("Creating thread");
+    pthread_create(&thread, NULL, (void *)&sample, (void *)&params);
     /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sample, lodArray[currentLOD], 0, &threadID);*/
     resampled = 1;
 }

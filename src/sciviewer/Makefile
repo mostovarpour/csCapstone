@@ -6,6 +6,9 @@ LINK=$(foreach lib, $(LIBS), -l$(lib))
 all: clean setup lod prob main tween
 	gcc $(OBJDIR)/main.o $(OBJDIR)/lod2.o $(OBJDIR)/prob.o $(OBJDIR)/tween.o -w -o $(BINDIR)/main $(LINK)
 
+prob2test: clean setup lod prob2 main tween
+	gcc $(OBJDIR)/main.o $(OBJDIR)/lod2.o $(OBJDIR)/prob.o $(OBJDIR)/tween.o -w -o $(BINDIR)/main $(LINK)
+
 setup:
 	mkdir -p $(BINDIR)
 	mkdir -p $(OBJDIR)
@@ -15,6 +18,9 @@ lod:
 
 prob:
 	gcc -c prob.c -o $(OBJDIR)/prob.o
+
+prob2:
+	gcc -c prob2.c -o $(OBJDIR)/prob.o
 
 main:
 	gcc -c main.c -o $(OBJDIR)/main.o

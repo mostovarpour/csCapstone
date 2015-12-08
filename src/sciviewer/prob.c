@@ -1,185 +1,128 @@
 #include "headers/probabilistic.h"
-int scale;  //data reduction scale.  We are creating a 1:Scale representation of the image.
+//TODO get scale as input
+int scale = 16;
 
-/*
-   Uses stochastic sampling to fill the data section of an SVImage struct.
-   */
+int limit_band_count(int count) {
+    if(count >= 3) return 3;
+    return 1;
+}
 
-void sample(LevelOfDetail* in) {		//TODO handle 32 bit representations
-    int* xLow = malloc(sizeof(int));
-    int* xHigh = malloc(sizeof(int));
-    int* yLow = malloc(sizeof(int));
-    int* yHigh = malloc(sizeof(int));
+void fill_image_data(GDALImage *image)
+{
+    GDALResult result;
+    // Open GDAL File
+    image->dataset = GDALOpen(image->filepath, GA_ReadOnly);
+    FAILIF(image->dataset, NULL, "Unable to open file.");
+    // Get file information
+    image->driver         = GDALGetDatasetDriver(image->dataset);
+    image->original_width  = GDALGetRasterXSize(image->dataset);
+    image->original_height = GDALGetRasterYSize(image->dataset);
+    image->band_count      = limit_band_count(GDALGetRasterCount(image->dataset));
 
-    svGetVisibleTiles(xLow, xHigh, yLow, yHigh);
+    // Open first band to get block information
+    image->current_band = GDALGetRasterBand(image->dataset, 1);
+    result = GDALGetGeoTransform(image->dataset, image->geo_transform);
+    FAILIF(result, CE_Failure, "Failed to get GeoTransform data");
+    GDALGetBlockSize(image->current_band, &image->block_size.x, &image->block_size.y);
+    image->output_size.x = image->block_size.x/image->scale;
+    image->output_size.y = image->block_size.y/image->scale;
+    image->num_blocks.x = image->original_height/image->block_size.x;
+    image->num_blocks.y = image->original_height/image->block_size.y;
+}
 
-    GDALDatasetH  hDataset;
+void print_file_information(GDALImage *image) 
+{
+    printf("Driver: %s/%s\n", GDALGetDriverShortName(image->driver), GDALGetDriverLongName(image->driver));
+    printf("Width: %d\n", image->original_width);
+    printf("Height: %d\n", image->original_height);
+    printf("Band Count (limited to 3) %d\n", image->band_count);
+    printf("Pixel Size = (%.6f,%.6f)\n", image->geo_transform[1], image->geo_transform[5]);
+    printf("X Block size = %d\n", image->block_size.x);
+    printf("Y Block size = %d\n", image->block_size.y);
+    printf("X output size = %d\n", image->output_size.x);
+    printf("Y output size = %d\n", image->output_size.y);
+    printf("X Blocks = %d\n", image->num_blocks.x);
+    printf("Y Blocks = %d\n", image->num_blocks.y);
+}
+void sample(sample_parameters *params) {
+    printf("Opening %s", params->filepath);
+    sample_prep(params->filepath, params->lod, DEFAULT_AVG_SAMPLE_COUNT);
+}
+
+// prepare for downsampling
+void sample_prep(char* filepath, LevelOfDetail* lod, int avg_sample_count) 
+{
+    GDALImage image;
+    /********************
+     *FILE INITIALIZATION
+     ********************/
+    // Initialize drivers
     GDALAllRegister();
-    GDALRasterBandH hBand;
 
-    //TODO Dynamically calculate sample count?
-    int avgSampleCount = 25;
+    // Get file information
+    image.filepath = filepath;
+    image.scale = scale;
+    fill_image_data(&image);
 
-    //Open GDAL File
-    //------------------------------------------------
-    hDataset = GDALOpen( filepath, GA_ReadOnly );
-    if( hDataset == NULL )
-    {
-        printf("Unable to open file."); 
-        exit(0);
-    }
-    // File was opened successfully
-
-    //GDAL FILE INFO
-    //---------------------------------------------
-    GDALDriverH   hDriver;
-    double        adfGeoTransform[6];
-    hDriver = GDALGetDatasetDriver( hDataset );
-
-    //Print GDAL Driver 
-    printf( "Driver: %s/%s\n",
-            GDALGetDriverShortName( hDriver ),
-            GDALGetDriverLongName( hDriver ) );
-    //Get original raster size
-    int origWidth = GDALGetRasterXSize( hDataset ); 
-    int origHeight = GDALGetRasterYSize( hDataset ); 
-    printf("width = %i\n", origWidth);
-    printf("height = %i\n", origHeight);  
-    //Get Raster band count	
-    int origBandCount = GDALGetRasterCount( hDataset );
-    printf("origBandCount = %i\n", origBandCount);
-    int bandCount;
-    if (origBandCount >= 3){
-        bandCount = 3;
-    }else{
-        bandCount = 1;
-    }
-    //Target output Width and Height
-    float stride = (scale * scale);				
-    stride /= (avgSampleCount);
-    //the greatest number of pixels that can be skipped in a single iteration
-    int maxStride = ((int)stride) + 1;				
-    //Load band 1
-    hBand = GDALGetRasterBand( hDataset, 1 );
-    if( GDALGetGeoTransform( hDataset, adfGeoTransform ) == CE_None ){
-        printf( "Pixel Size = (%.6f,%.6f)\n",
-                adfGeoTransform[1], adfGeoTransform[5] );
-    }
-    int* xBlockSize = malloc (sizeof(int));
-    int* yBlockSize = malloc (sizeof(int));
-    //get block size
-    GDALGetBlockSize( hBand, xBlockSize, yBlockSize);
-    printf("xBlockSize = %i\n", *xBlockSize);
-    printf("yBlockSize = %i\n", *yBlockSize);  
-    int xOutputSize = ((*xBlockSize) / scale);
-    int yOutputSize = ((*yBlockSize) / scale);
-    printf("X Output Size%i\n", xOutputSize);
-    int numXBlocks = origWidth/(*xBlockSize);
-    int numYBlocks = origHeight/(*yBlockSize);
-    printf("numXBlocks = %i\n", numXBlocks);
-    printf("numYBlocks = %i\n", numYBlocks);
-
-    /*if ((*xHigh < 0) || (*xHigh < *xLow)){*/
-        *xHigh = numXBlocks;
-    /*}*/
-    /*if ((*yHigh < 0)|| (*yHigh < *yLow)){*/
-        *yHigh = numYBlocks;
-    /*}*/
-
-    /*
-     *int usedXBlocks = ((*xHigh) - (*xLow));
-     *int usedYBlocks = ((*yHigh) - (*yLow));
-     *int usedBlocks = (usedXBlocks * usedYBlocks);
-     */
-
-    //unsigned char* output = CPLMalloc((sizeof(char) * xOutputSize* yOutputSize * (bandCount+1)));  // Allocate space for the output
-    float* vals = calloc( xOutputSize* yOutputSize * (bandCount+1), sizeof(float));			//stores pixel values
-    unsigned long* valsPerIndex = calloc( xOutputSize* yOutputSize * (bandCount+1), sizeof(unsigned long));		//stores number of pixel values per output index
-    unsigned long rseed = 0;
-    unsigned long rowIndex = 0;		//the index of the row to which we will output our value
-    unsigned long colIndex = 0;		//the index of the column to which we will output our value
-    unsigned long outIndex = 0;
-    unsigned long sampledIndex = 0;	//One dimensional representation of column/row index
-    //iterate through each pixel, jump to the last pixel we sampled.
-    long long i = 0;
-    /*
-     *long long e = 0;
-     *int j;
-     */
+#ifdef DEBUG
+    // Print information about the file
+    print_file_information(&image);
     printf("xLow: %i \n xHigh: %i \n yLow: %i\n yHigh: %i\n", *xLow, *xHigh, *yLow, *yHigh);
+#endif   
+    /*******************
+     *END INITIALIZATION
+     *******************/
+    stochastic_sample(&image, avg_sample_count, lod);
+}
 
-    /*
-       for (i = 0; i<usedBlocks; i++){
-       in->data[i]->Data = calloc(xOutputSize* yOutputSize * (bandCount+1), sizeof(unsigned char));
-       }
-       */
+void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lod)
+{
+    float *vals;
+    unsigned long seed, row_index, col_index, out_index, sample_index, *vals_per_index;
+    long long i;
+    int maxStride;
+    double stride;
+    int xBlockLow, xBlockHigh, yBlockLow, yBlockHigh;
 
-    if (GDALGetRasterDataType(hBand) == GDT_Int16){	
-        //TODO implement 16 bit
-    }else{
-        unsigned char* data = (unsigned char *) CPLMalloc(sizeof(char) * (*xBlockSize)*(*yBlockSize) * numXBlocks * numYBlocks*10);
+    // get block range to display
+    svGetVisibleTiles(&xBlockLow, &xBlockHigh, &yBlockLow, &yBlockHigh);
+
+    // Calculate stride for reading
+    stride = (scale * scale) / avg_sample_count;
+    maxStride = ((int)stride) + 1;
+
+    // Set bounds that we will should read
+    if(xBlockHigh < 0 || xBlockHigh < xBlockLow)
+        xBlockHigh = image->num_blocks.x;
+    if(yBlockHigh < 0 || yBlockHigh < yBlockLow)
+        yBlockHigh = image->num_blocks.y;
+    
+    // Possibly change these to band_count + 1
+    vals = calloc(image->output_size.x * image->output_size.y * image->band_count, sizeof(float));
+    vals_per_index = calloc(image->output_size.x * image->output_size.y * image->band_count, sizeof(long));
+    seed = row_index = col_index = out_index = sample_index = i = 0;
+    if(GDALGetRasterDataType(image->current_band) == GDT_Int16) 
+    {
+        puts("GDT_Int16");
+    }
+    else
+    {
+        // Allocate data for each block
+        unsigned char *data = (unsigned char*) CPLMalloc(sizeof(char) * image->block_size.x * image->block_size.y * image->num_blocks.x * image->num_blocks.y);
         int band;
-        for (band = 1; band <= bandCount; band++){
-            hBand = GDALGetRasterBand( hDataset, band );
-            int yBlock;
-            int xBlock;
-            for(yBlock = *yLow; yBlock < *yHigh; yBlock++){
-                for(xBlock = *xLow; xBlock < *xHigh; xBlock++){
-                    printf("xBlock: %d, xHigh: %d\n", xBlock, *xHigh);
-                    //printf("%i\n",xBlock);
-                    if(in->data[(yBlock * numXBlocks) + xBlock]->Sampled == 0){
-                        printf("Reading Block x: %d y: %d\n", xBlock, yBlock);
-                        if(GDALReadBlock(hBand,xBlock,yBlock, data) == CE_Failure) {
-                            puts("Failed to read block");
-                            //Testing
-                            puts("Made it this far...\n");
-                            continue;
-                        }
-                        //Testing
-                        puts("Made it this far...\n");
-                        puts("Block read");
-                        for(i=0 ; i < ((*xBlockSize)*(*yBlockSize)) ; i += rseed){
-                            rseed = (214013 * rseed + 2531011);
-                            rseed %= maxStride;	
-                            sampledIndex = i;
-                            i = (maxStride == 1) ? (i+1) : i;
-                            rowIndex = (sampledIndex/(xOutputSize*scale* scale));
-                            colIndex = ((sampledIndex % (xOutputSize * scale))/scale);
-                            outIndex = (((rowIndex*xOutputSize) + colIndex));
-                            vals[outIndex] += (*(data + sampledIndex));
-                            valsPerIndex[outIndex] +=1;
-                        }
-
-                        //Testing
-                        puts("Made it this far...\n");
-                        for (i=0; i< ( xOutputSize* yOutputSize* (bandCount+1)); i+=4){
-                            //output[i] = (unsigned char) (vals[i]/valsPerIndex[i]);	//calculate final output by averaging each color value
-                            in->data[(yBlock * numXBlocks) + xBlock]->Data[i+ (band-1)] = (unsigned char) (vals[((i/4))]/valsPerIndex[((i/4))]);
-                            if(band ==1){
-                                in->data[(yBlock * numXBlocks) + xBlock]->Data[i+3] = (unsigned char) 255;
-                            }
-                        }
-
-                        //clear vals for the next block
-                        for (i=0; i< ( xOutputSize* yOutputSize* (bandCount+1)); i++){
-                            vals[i] = 0;
-                            valsPerIndex[i] = 0;
-                        }
-                        in->data[(yBlock * numXBlocks) + xBlock]->Width = xOutputSize;
-                        in->data[(yBlock * numXBlocks) + xBlock]->Height = yOutputSize;
-                        in->data[(yBlock * numXBlocks) + xBlock]->Format = GL_RGBA;
-                        in->data[(yBlock * numXBlocks) + xBlock]->BytesPerPixel = 1;
-                        if(band == bandCount){
-                            in->data[(yBlock * numXBlocks) + xBlock]->Sampled = 1;
-                        }
-                    }
+        for(band = 1; band <= image->band_count; band++)
+        {
+            // Get the current band
+            image->current_band = GDALGetRasterBand(image->dataset, band);
+            int x_block, y_block;
+            // iterate through each block
+            for(y_block = yBlockLow; y_block < yBlockHigh; y_block++)
+            {
+                for(x_block = xBlockLow; x_block < xBlockHigh; x_block++)
+                {
+                    printf("Doing something with block (%d, %d)\n", x_block, y_block);
                 }
             }
         }
     }
-
-    /*int currentlySampling = 0;*/
-
-    printf("sampling complete\n");
-    GDALClose(hDataset);
 }
