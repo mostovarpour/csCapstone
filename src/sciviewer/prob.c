@@ -156,14 +156,12 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
                             lod->data[current_index]->Data[i+3] = 255;
                         }
                     }
-                    /*
-                     *lod->data[current_index]->Width = image->output_size.x;
-                     *lod->data[current_index]->Height = image->output_size.y;
-                     *lod->data[current_index]->Format = GL_RGBA;
-                     *lod->data[current_index]->BytesPerPixel = 1;
-                     *if(band == image->band_count)
-                     *    lod->data[current_index]->Sampled = 1;
-                     */
+                    lod->data[current_index]->Width = image->output_size.x;
+                    lod->data[current_index]->Height = image->output_size.y;
+                    lod->data[current_index]->Format = GL_RGBA;
+                    lod->data[current_index]->BytesPerPixel = 1;
+                    if(band == image->band_count)
+                        lod->data[current_index]->Sampled = 1;
                 }
             }
         }
