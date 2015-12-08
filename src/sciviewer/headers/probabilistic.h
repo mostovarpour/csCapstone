@@ -35,6 +35,10 @@ typedef struct sample_parms
 {
     char *filepath;
     LevelOfDetail *lod;
+    int x_low;
+    int y_low;
+    int x_high;
+    int y_high;
 } sample_parameters;
 
 typedef int GDALResult;

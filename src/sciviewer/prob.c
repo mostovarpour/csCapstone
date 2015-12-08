@@ -26,8 +26,13 @@ void fill_image_data(GDALImage *image)
     GDALGetBlockSize(image->current_band, &image->block_size.x, &image->block_size.y);
     image->output_size.x = image->block_size.x/image->scale;
     image->output_size.y = image->block_size.y/image->scale;
-    image->num_blocks.x = image->original_height/image->block_size.x;
+    image->num_blocks.x = image->original_width/image->block_size.x;
     image->num_blocks.y = image->original_height/image->block_size.y;
+
+    DEFAULT(image->num_blocks.x, 0, 1);
+    DEFAULT(image->num_blocks.y, 0, 1);
+    DEFAULT(image->output_size.x, 0, 1);
+    DEFAULT(image->output_size.y, 0, 1);
 }
 
 void print_file_information(GDALImage *image) 
@@ -45,7 +50,6 @@ void print_file_information(GDALImage *image)
     printf("Y Blocks = %d\n", image->num_blocks.y);
 }
 void sample(sample_parameters *params) {
-    printf("Opening %s", params->filepath);
     sample_prep(params->filepath, params->lod, DEFAULT_AVG_SAMPLE_COUNT);
 }
 
@@ -66,8 +70,9 @@ void sample_prep(char* filepath, LevelOfDetail* lod, int avg_sample_count)
 
 #ifdef DEBUG
     // Print information about the file
+    puts("--------------------------------------------------------------------");
     print_file_information(&image);
-    printf("xLow: %i \n xHigh: %i \n yLow: %i\n yHigh: %i\n", *xLow, *xHigh, *yLow, *yHigh);
+    puts("--------------------------------------------------------------------");
 #endif   
     /*******************
      *END INITIALIZATION
@@ -78,24 +83,28 @@ void sample_prep(char* filepath, LevelOfDetail* lod, int avg_sample_count)
 void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lod)
 {
     float *vals;
-    unsigned long seed, row_index, col_index, out_index, sample_index, *vals_per_index;
+    unsigned long seed, row_index, col_index, out_index, sample_index, *vals_per_index, current_index;
     long long i;
     int maxStride;
     double stride;
     int xBlockLow, xBlockHigh, yBlockLow, yBlockHigh;
-
+    srand(time(NULL));
     // get block range to display
     svGetVisibleTiles(&xBlockLow, &xBlockHigh, &yBlockLow, &yBlockHigh);
+
+    /*if(xBlockHigh < 0 || xBlockHigh < xBlockLow)*/
+        xBlockHigh = image->num_blocks.x;
+    /*if(yBlockHigh < 0 || yBlockHigh < yBlockLow)*/
+        yBlockHigh = image->num_blocks.y;
+#ifdef DEBUG
+    printf("xLow: %i \nxHigh: %i\nyLow: %i\nyHigh: %i\n", xBlockLow, xBlockHigh, yBlockLow, yBlockHigh);
+#endif
 
     // Calculate stride for reading
     stride = (scale * scale) / avg_sample_count;
     maxStride = ((int)stride) + 1;
 
     // Set bounds that we will should read
-    if(xBlockHigh < 0 || xBlockHigh < xBlockLow)
-        xBlockHigh = image->num_blocks.x;
-    if(yBlockHigh < 0 || yBlockHigh < yBlockLow)
-        yBlockHigh = image->num_blocks.y;
     
     // Possibly change these to band_count + 1
     vals = calloc(image->output_size.x * image->output_size.y * image->band_count, sizeof(float));
@@ -108,7 +117,7 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
     else
     {
         // Allocate data for each block
-        unsigned char *data = (unsigned char*) CPLMalloc(sizeof(char) * image->block_size.x * image->block_size.y * image->num_blocks.x * image->num_blocks.y);
+        GByte *data = CPLMalloc(image->block_size.x * image->block_size.y);
         int band;
         for(band = 1; band <= image->band_count; band++)
         {
@@ -120,9 +129,46 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
             {
                 for(x_block = xBlockLow; x_block < xBlockHigh; x_block++)
                 {
-                    printf("Doing something with block (%d, %d)\n", x_block, y_block);
+#ifdef DEBUG
+                    printf("Reading Block (%d, %d)\n", x_block, y_block);
+#endif
+                    if(GDALReadBlock(image->current_band, x_block, y_block, data) == CE_Failure){
+                        printf("Failed to read block (%d, %d)\n", x_block, y_block);
+                        exit(1);
+                    }
+                    for(i = 0; i < image->block_size.x*image->block_size.y; i += seed) 
+                    {
+                        seed = rand() * rand();
+                        seed %= maxStride;
+                        row_index = i/(image->output_size.x * scale * scale);
+                        col_index = (i % (image->output_size.x * scale))/scale;
+                        out_index = row_index*image->output_size.x + col_index;
+                        vals[out_index] += *(data + i);
+                        vals_per_index += 1;
+                    }
+                    current_index = y_block * image->num_blocks.x + x_block;
+                    for(i = 0; i < image->output_size.x * image->output_size.y * image->band_count + 1; i += 4)
+                    {
+                        // TODO possibly make this if/else
+                        lod->data[current_index]->Data[i + band - 1] = vals[i/4]/vals_per_index[i/4];
+                        if(band == 1)
+                        {
+                            lod->data[current_index]->Data[i+3] = 255;
+                        }
+                    }
+                    /*
+                     *lod->data[current_index]->Width = image->output_size.x;
+                     *lod->data[current_index]->Height = image->output_size.y;
+                     *lod->data[current_index]->Format = GL_RGBA;
+                     *lod->data[current_index]->BytesPerPixel = 1;
+                     *if(band == image->band_count)
+                     *    lod->data[current_index]->Sampled = 1;
+                     */
                 }
             }
         }
     }
+    GDALClose(image->dataset);
+    puts("Done Sampling");
+    exit(0);
 }

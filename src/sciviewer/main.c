@@ -521,7 +521,6 @@ void svGetVisibleTiles(int* xLowOut, int* xHighOut, int* yLowOut, int* yHighOut)
             yLow = 0;
         }
 
-        //printf("xLow: %i\n xHigh: %i\n yLow: %i\n yHigh: %i\n", xLow, xHigh, yLow, yHigh);
 
         *xLowOut = xLow;
         *xHighOut =xHigh;
@@ -709,7 +708,11 @@ int main(int argc, char **argv) {
 
     currentlySampling = 1;
     pthread_t thread;
-    pthread_create(&thread, NULL, (void *)&sample, mLod[currentLOD-1]);
+    sample_parameters params;
+    params.filepath = filepath;
+    params.lod = mLod[currentLOD-1];
+    params.x_low = params.y_low = params.x_high = params.y_high = 0;
+    pthread_create(&thread, NULL, (void *)&sample, &params);
     /*HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sample, mLod[currentLOD-1], 0, &threadID);*/
 
     //Todo Create Function to init index buffer
