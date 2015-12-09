@@ -88,7 +88,6 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
     int maxStride;
     double stride;
     int xBlockLow, xBlockHigh, yBlockLow, yBlockHigh;
-    srand(time(NULL));
     // get block range to display
     svGetVisibleTiles(&xBlockLow, &xBlockHigh, &yBlockLow, &yBlockHigh);
 
@@ -107,8 +106,8 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
     // Set bounds that we will should read
     
     // Possibly change these to band_count + 1
-    vals = calloc(image->output_size.x * image->output_size.y * image->band_count, sizeof(float));
-    vals_per_index = calloc(image->output_size.x * image->output_size.y * image->band_count, sizeof(long));
+    vals = calloc(image->output_size.x * image->output_size.y * (image->band_count+1), sizeof(float));
+    vals_per_index = calloc(image->output_size.x * image->output_size.y * (image->band_count+1), sizeof(long));
     seed = row_index = col_index = out_index = sample_index = i = 0;
     if(GDALGetRasterDataType(image->current_band) == GDT_Int16) 
     {
@@ -116,57 +115,58 @@ void stochastic_sample(GDALImage *image, int avg_sample_count, LevelOfDetail *lo
     }
     else
     {
-        // Allocate data for each block
-        GByte *data = CPLMalloc(image->block_size.x * image->block_size.y);
+        GByte* data = (GByte *) CPLMalloc(sizeof(char) * image->block_size.x * image->block_size.y);
         int band;
-        for(band = 1; band <= image->band_count; band++)
-        {
-            // Get the current band
-            image->current_band = GDALGetRasterBand(image->dataset, band);
-            int x_block, y_block;
-            // iterate through each block
-            for(y_block = yBlockLow; y_block < yBlockHigh; y_block++)
+        for (band = 1; band <= image->band_count; band++){
+            image->current_band = GDALGetRasterBand( image->dataset, band );
+            int yBlock, xBlock;
+            for(yBlock = yBlockLow; yBlock < yBlockHigh; yBlock++)
             {
-                for(x_block = xBlockLow; x_block < xBlockHigh; x_block++)
+                for(xBlock = xBlockLow; xBlock < xBlockHigh; xBlock++)
                 {
-#ifdef DEBUG
-                    printf("Reading Block (%d, %d)\n", x_block, y_block);
-#endif
-                    if(GDALReadBlock(image->current_band, x_block, y_block, data) == CE_Failure){
-                        printf("Failed to read block (%d, %d)\n", x_block, y_block);
-                        exit(1);
-                    }
-                    for(i = 0; i < image->block_size.x*image->block_size.y; i += seed) 
+                    if(lod->data[(yBlock * image->num_blocks.x) + xBlock]->Sampled == 0)
                     {
-                        seed = rand() * rand();
-                        seed %= maxStride;
-                        row_index = i/(image->output_size.x * scale * scale);
-                        col_index = (i % (image->output_size.x * scale))/scale;
-                        out_index = row_index*image->output_size.x + col_index;
-                        vals[out_index] += *(data + i);
-                        vals_per_index += 1;
-                    }
-                    current_index = y_block * image->num_blocks.x + x_block;
-                    for(i = 0; i < image->output_size.x * image->output_size.y * image->band_count + 1; i += 4)
-                    {
-                        // TODO possibly make this if/else
-                        lod->data[current_index]->Data[i + band - 1] = vals[i/4]/vals_per_index[i/4];
-                        if(band == 1)
+                        if(GDALReadBlock(image->current_band,xBlock,yBlock, data) == CE_Failure) 
                         {
-                            lod->data[current_index]->Data[i+3] = 255;
+                            continue;
+                        }
+                        //Testing
+                        for(i=0 ; i < image->block_size.x * image->block_size.y ; i += seed){
+                            seed = (214013 * seed + 2531011);
+                            seed %= maxStride;	
+                            row_index = i/(image->output_size.x * scale * scale);
+                            col_index = (i % (image->output_size.x * scale))/scale;
+                            out_index = row_index * image->output_size.x + col_index;
+                            vals[out_index] += *(data + i);
+                            vals_per_index[out_index] +=1;
+                        }
+
+                        current_index = yBlock * image->num_blocks.x + xBlock;
+                        for (i=0; i< ( image->output_size.x* image->output_size.y* (image->band_count+1)); i+=4){
+                            //output[i] = (unsigned char) (vals[i]/valsPerIndex[i]);	//calculate final output by averaging each color value
+                            lod->data[current_index]->Data[i+ (band-1)] = (vals[((i/4))]/vals_per_index[((i/4))]);
+                            if(band ==1){
+                                lod->data[current_index]->Data[i+3] = 255;
+                            }
+                        }
+
+                        //clear vals for the next block
+                        memset(vals, 0, image->output_size.x * image->output_size.y * (image->band_count + 1) * sizeof(float));
+                        memset(vals_per_index, 0, image->output_size.x * image->output_size.y * (image->band_count + 1) * sizeof(float));
+
+
+                        lod->data[current_index]->Width = image->output_size.x;
+                        lod->data[current_index]->Height = image->output_size.y;
+                        lod->data[current_index]->Format = GL_RGBA;
+                        lod->data[current_index]->BytesPerPixel = 1;
+                        if(band == image->band_count){
+                            lod->data[current_index]->Sampled = 1;
                         }
                     }
-                    lod->data[current_index]->Width = image->output_size.x;
-                    lod->data[current_index]->Height = image->output_size.y;
-                    lod->data[current_index]->Format = GL_RGBA;
-                    lod->data[current_index]->BytesPerPixel = 1;
-                    if(band == image->band_count)
-                        lod->data[current_index]->Sampled = 1;
                 }
             }
         }
     }
     GDALClose(image->dataset);
     puts("Done Sampling");
-    exit(0);
 }
