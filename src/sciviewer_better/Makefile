@@ -3,7 +3,7 @@ BINDIR=build/bin
 LIBS=glfw3 gdal GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama
 LINK=$(foreach lib, $(LIBS), -l$(lib))
 
-FILES=glhelper main gdalreader 
+FILES=glhelper main gdalreader raster
 
 all: clean setup compile
 	gcc $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK)

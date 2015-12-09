@@ -5,6 +5,7 @@
 #include <math.h>
 #include "glhelper.h"
 #include "gdalreader.h"
+#include "raster.h"
 #ifdef win32
     #include <windows.h>
 #else
@@ -18,36 +19,28 @@ char *filepath;
 int main(int argc, char **argv)
 {
     SETFILEPATH(argc, argv); // check for filepath passed as command line arg
-    init_glfw(&window);
-    glClearColor(0,0,0,0); // set the clear color to black;
+    init_glfw(&window); // initialize openGL
+    /*glClearColor(0,0,0,0); // set the clear color to black;*/
 
+    // window width, height, and the variable to hold the image we will be sampling
     int window_width, window_height;
-    glfwGetWindowSize(window, &window_width, &window_height);
     GDALImage image;
-    puts("sampling...");
-    sample(filepath , &image);
-/*    float *Test = (float*)malloc(sizeof(float) * window_width * window_height * 3 );*/
-    /*int i;*/
-    /*for(i = 0; i < window_width*window_height; i+=3) {*/
-        /*Test[i] = 0;*/
-        /*Test[i+1] = 200;*/
-        /*Test[i+2] = 0;*/
-        /*Test[i+3] = 255;*/
-    /*}*/
+    GLint shader_program_id = init_shaders(); // initialize shaders
+    glUseProgram(shader_program_id);
+    
+    puts("main loop");
     // main loop
-    puts("done sampling");
     while(!glfwWindowShouldClose(window))
     {
-        glfwGetWindowSize(window, &window_width, &window_height);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawPixels(window_width, window_height, GL_R, GL_FLOAT, image.data);
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwGetWindowSize(window, &window_width, &window_height); // get window size
+        glClear(GL_COLOR_BUFFER_BIT); // clear window
+        glfwSwapBuffers(window); // swap buffers (like vsync)
+        glfwPollEvents(); // glfw thing that manages window events
     }
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    CPLFree(image.data);
-    /*
-     *free(Test);
-     */
+
+    glfwDestroyWindow(window); // make sure the window is closed
+    glfwTerminate(); // kill glfw
+    if(image.data) // free the data created with CPLMalloc
+        CPLFree(image.data);
+    return 0;
 }
