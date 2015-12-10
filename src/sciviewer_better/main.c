@@ -1,3 +1,5 @@
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
@@ -20,19 +22,18 @@ int main(int argc, char **argv)
 {
     SETFILEPATH(argc, argv); // check for filepath passed as command line arg
     init_glfw(&window); // initialize openGL
-    /*glClearColor(0,0,0,0); // set the clear color to black;*/
+    glewExperimental = GL_TRUE;
+    glewInit();
 
     // window width, height, and the variable to hold the image we will be sampling
-    int window_width, window_height;
     GDALImage image;
     GLint shader_program_id = init_shaders(); // initialize shaders
     glUseProgram(shader_program_id);
     
-    puts("main loop");
     // main loop
     while(!glfwWindowShouldClose(window))
     {
-        glfwGetWindowSize(window, &window_width, &window_height); // get window size
+        glClearColor(0,0,0,0); // set the clear color to black;
         glClear(GL_COLOR_BUFFER_BIT); // clear window
         glfwSwapBuffers(window); // swap buffers (like vsync)
         glfwPollEvents(); // glfw thing that manages window events

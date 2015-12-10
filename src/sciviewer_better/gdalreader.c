@@ -9,6 +9,7 @@ int limit_band_count(int count) {
 
 void fill_image_data(GDALImage *image)
 {
+    GDALAllRegister();
     GDALResult result;
     // Open GDAL File
     image->dataset = GDALOpen(image->filepath, GA_ReadOnly);
@@ -33,23 +34,25 @@ void fill_image_data(GDALImage *image)
     DEFAULT(image->num_blocks.y, 0, 1);
     DEFAULT(image->output_size.x, 0, 1);
     DEFAULT(image->output_size.y, 0, 1);
-    fill_bands(image);
+    /*fill_bands(image);*/
 }
 
-void fill_bands(GDALImage *image)
-{
-    image->data = (float *) CPLMalloc(sizeof(float) * 800 * 600);
-    /*if(GDALDatasetRasterIO(image->dataset, GF_Read, 0, 0, image->original_width, image->original_height, image->data, 800, 600, GDT_Float32, 3, NULL, 0, 0, 0) == CE_Failure)*/
-    /*{*/
-        /*puts("Error reading raster bands");*/
-        /*exit(1);*/
-    /*}*/
-    if(GDALRasterIO(image->current_band, GF_Read, 0, 0, image->original_width, image->original_height, image->data, 800, 600, GDT_Float32, 0, 0)  == CE_Failure)
-    {
-        puts("Error reading raster bands");
-        exit(1);
-    }
-}
+/*
+ *void fill_bands(GDALImage *image)
+ *{
+ *    image->data = (float *) CPLMalloc(sizeof(float) * 800 * 600);
+ *    [>if(GDALDatasetRasterIO(image->dataset, GF_Read, 0, 0, image->original_width, image->original_height, image->data, 800, 600, GDT_Float32, 3, NULL, 0, 0, 0) == CE_Failure)<]
+ *    [>{<]
+ *        [>puts("Error reading raster bands");<]
+ *        [>exit(1);<]
+ *    [>}<]
+ *    if(GDALRasterIO(image->current_band, GF_Read, 0, 0, image->original_width, image->original_height, image->data, 800, 600, GDT_Float32, 0, 0)  == CE_Failure)
+ *    {
+ *        puts("Error reading raster bands");
+ *        exit(1);
+ *    }
+ *}
+ */
 
 void print_file_information(GDALImage *image) 
 {
@@ -69,13 +72,12 @@ void print_file_information(GDALImage *image)
 // prepare for downsampling
 void sample(char* filepath, GDALImage *image) 
 {
-    // Initialize drivers
-    GDALAllRegister();
-
     // Get file information
     image->filepath = filepath;
     image->scale = scale;
     fill_image_data(image);
+    
+    //TODO create and call downsampling function
 
 #ifdef DEBUG
     // Print information about the file
@@ -85,3 +87,15 @@ void sample(char* filepath, GDALImage *image)
 #endif   
 }
 
+void downsample(GDALImage *image)
+{
+    if(GDALGetRasterDataType(image->current_band) == GDT_Int16)
+    {
+        puts("GDT_16");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        GByte *data = (GByte *) CPLMalloc(sizeof(char) * image->block_size.x * image->block_size.y); // buffer for image data
+    }
+}

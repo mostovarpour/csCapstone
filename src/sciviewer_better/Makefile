@@ -1,6 +1,6 @@
 OBJDIR=build/obj
 BINDIR=build/bin
-LIBS=glfw3 gdal GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama
+LIBS=glfw3 gdal GLEW GLU GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama
 LINK=$(foreach lib, $(LIBS), -l$(lib))
 
 FILES=glhelper main gdalreader raster

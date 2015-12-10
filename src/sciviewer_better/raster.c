@@ -28,7 +28,7 @@ GLint simple_shader(GLint shader_type, const char* shader_src) {
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_success);
     if (compile_success == GL_FALSE) {
         GLchar message[256];
-        glGetShaderInfoLog(shader_id, sizeof(message), 0, &message[0]);
+        glGetShaderInfoLog(shader_id, sizeof(message), 0, message);
         printf("glCompileShader Error: %s\n", message);
         exit(1);
     }
@@ -71,8 +71,10 @@ void init_raster(Raster * raster_data, GLint program_id, GDALImage *image)
     // some shader magic
     raster_data->position_slot = glGetAttribLocation(program_id, "Position1");
     raster_data->color_slot = glGetAttribLocation(program_id, "SourceColor1");
+    raster_data->size = image->num_blocks.x * image->num_blocks.y; // TODO we won't always have block bounds, so this will need to be updated
     glEnableVertexAttribArray(raster_data->position_slot);
     glEnableVertexAttribArray(raster_data->color_slot);
+    //TODO stuff with raster objects
 }
 
 void render_raster(Raster *raster)
@@ -81,5 +83,7 @@ void render_raster(Raster *raster)
     glUniform1i(raster->color_slot, 0);
     for(i = 0; i < raster->size; i++)
     {
+        //TODO glBindBuffer
+        //TODO stuff with raster objects
     }
 }
