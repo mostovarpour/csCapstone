@@ -33,6 +33,25 @@ void fill_image_data(GDALImage *image)
     DEFAULT(image->output_size.y, 0, 1);
 }
 
+void fill_bands(GDALImage *image)
+{
+    image->data = (float *) CPLMalloc(sizeof(float) * 800 * 600);
+    /*if(GDALDatasetRasterIO(image->dataset, GF_Read, 0, 0, image->original_width, image->original_height, image->data, 800, 600, GDT_Float32, 3, NULL, 0, 0, 0) == CE_Failure)*/
+    /*{*/
+        /*puts("Error reading raster bands");*/
+        /*exit(1);*/
+    /*}*/
+
+    long x,y;
+    x = GDALGetRasterBandXSize(image->current_band);
+    y = GDALGetRasterBandYSize(image->current_band);
+    if(GDALRasterIO(image->current_band, GF_Read, 0, 0, 1800, 1800, image->data, 800, 600, GDT_Float32, 0, 0)  == CE_Failure)
+    {
+        puts("Error reading raster bands");
+        exit(1);
+    }
+}
+
 void print_file_information(GDALImage *image) 
 {
     printf("Driver: %s/%s\n", GDALGetDriverShortName(image->driver), GDALGetDriverLongName(image->driver));

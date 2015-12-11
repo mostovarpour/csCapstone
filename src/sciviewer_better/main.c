@@ -5,43 +5,48 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #include "glhelper.h"
 #include "gdalreader.h"
 #include "raster.h"
+
 #ifdef win32
     #include <windows.h>
 #else
     #include <pthread.h>
 #endif 
-
-#define SETFILEPATH(argc, argv) {if(argc > 1) filepath = argv[1]; }
-
 GLFWwindow *window;
-char *filepath;
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    SETFILEPATH(argc, argv); // check for filepath passed as command line arg
     init_glfw(&window); // initialize openGL
+    // In my case this isn't actually necessary which is kind of weird, but so it works
+    // on all other machines it should be kept. I don't think windows is smart enough
+    // to get those functions on its own even though linux may be
     glewExperimental = GL_TRUE;
-    glewInit();
-
-    // window width, height, and the variable to hold the image we will be sampling
+    glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
+    GLuint vao, ebo, vbo, v_shader, f_shader, shader_program, tex;
     GDALImage image;
-    GLint shader_program_id = init_shaders(); // initialize shaders
-    glUseProgram(shader_program_id);
-    
+    setup_polygons(&vao, &ebo, &vbo, &v_shader, &f_shader, &shader_program);
+    setup_texture(shader_program, window, argv[1], &image, &tex);
+
+
     // main loop
     while(!glfwWindowShouldClose(window))
     {
-        glClearColor(0,0,0,0); // set the clear color to black;
-        glClear(GL_COLOR_BUFFER_BIT); // clear window
+        glClearColor(0,0,0,1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window); // swap buffers (like vsync)
         glfwPollEvents(); // glfw thing that manages window events
     }
-
     glfwDestroyWindow(window); // make sure the window is closed
+    // cleanup
+    CPLFree(image.data);
+    glDeleteTextures(1, &tex);
+    glDeleteProgram(shader_program);
+    glDeleteShader(v_shader);
+    glDeleteShader(f_shader);
+    glDeleteBuffers(1, &vbo);
     glfwTerminate(); // kill glfw
-    if(image.data) // free the data created with CPLMalloc
-        CPLFree(image.data);
     return 0;
 }

@@ -1,89 +1,146 @@
 #include "raster.h"
 
-const char* raster_vertex_shader_src = 
-"attribute vec4 Position1;"
-"attribute vec2 SourceColor1;"
-"varying vec2 DestinationColor1;"
-"uniform float zoomLevel;"
-"uniform float verticalOffset;"
-"uniform float horizontalOffset;"
-"void main(void) {"
-"    gl_Position = vec4((vec2((Position1[0] + horizontalOffset), (Position1[1] + verticalOffset))),Position1[2], (1.0 / zoomLevel));"
-"    DestinationColor1 = SourceColor1 ;" 
+const char *vertex_shader = 
+"#version 150\n" // declare version 1.5
+"in vec2 texCoord;"
+"in vec2 position;" // input is a 2d vector (X,Y)
+"out vec2 TexCoord;"
+"void main()"
+"{"
+    "TexCoord = texCoord;"
+    "gl_Position = vec4(position, 0.0, 1.0);" // convert vec2 to vec4 and set it gl_position
 "}";
 
-const char* raster_fragment_shader_src =
-/*"precision highp float;"*/
-"uniform sampler2D texture;"
-"varying vec2 DestinationColor1;"
-"void main(void) {"
-"    gl_FragColor = texture2D(texture, vec2(DestinationColor1[0], 1.0-DestinationColor1[1]));"
-"}";
+const char *fragment_shader =
+"#version 150\n"
+"uniform sampler2D tex;"
+"in vec2 TexCoord;"
+"out vec4 outColor;" // output a vec4 (r,g,b,a)
+"void main()"
+"{"
+    "vec4 tmp = texture2D(tex, TexCoord);"
+    "outColor = vec4(tmp.r, tmp.r, tmp.r, 1.0f);"
+"}"
+;
 
-GLint simple_shader(GLint shader_type, const char* shader_src) {
-    GLint compile_success = 0;
-    int shader_id = glCreateShader(shader_type);
-    glShaderSource(shader_id, 1, &shader_src, 0);
-    glCompileShader(shader_id);
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_success);
-    if (compile_success == GL_FALSE) {
-        GLchar message[256];
-        glGetShaderInfoLog(shader_id, sizeof(message), 0, message);
-        printf("glCompileShader Error: %s\n", message);
-        exit(1);
-    }
-
-    return shader_id;
-}
-
-GLint init_vertex_shader() 
+// pass in pointers so we can free the memory in the gpu later
+void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program) 
 {
-    return simple_shader(GL_VERTEX_SHADER, raster_vertex_shader_src);
-}
+    glewInit();
+    // create vertices simple triangle
+    float vertices[] = {
+        //position     //texture coordinates
+        -1.0f,  1.0f,  0.0f, 0.0f, // top left 
+         1.0f,  1.0f,  1.0f, 0.0f, // top right
+         1.0f, -1.0f,  1.0f, 1.0f, // bottom-right
+        -1.0f, -1.0f,  0.0f, 1.0f  // bottom-left
+    };
 
-GLint init_fragment_shader()
-{
-    return simple_shader(GL_FRAGMENT_SHADER, raster_fragment_shader_src);
-}
+    // create vertex array object for storing shader and attribute data
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(*vao);
 
-GLint init_shaders()
-{
-    GLint link_success;
-    GLint program_id = glCreateProgram();
-    GLint vertex_shader = init_vertex_shader();
-    GLint fragment_shader = init_fragment_shader();
-    glAttachShader(program_id, vertex_shader);
-    glAttachShader(program_id, fragment_shader);
-    glLinkProgram(program_id);
-    glGetProgramiv(program_id, GL_LINK_STATUS, &link_success);
-    if(!link_success)
+
+    // create vertex buffer
+    glGenBuffers(1, vbo); // generate one buffer
+    // make this buffer the "active" buffer
+    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+    // put vertices into the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // create element buffer
+    GLuint elements[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+    glGenBuffers(1, ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+    // create vertex shader
+    *v_shader = glCreateShader(GL_VERTEX_SHADER);
+    // load shader source into GPU
+    glShaderSource(*v_shader, 1, &vertex_shader, NULL);
+    // compile the shader
+    glCompileShader(*v_shader);
+    // check if shader compiled correctly
+    GLint status;
+    glGetShaderiv(*v_shader, GL_COMPILE_STATUS, &status);
+    if(status != GL_TRUE)
     {
-        GLchar message[256];
-        glGetProgramInfoLog(program_id, sizeof(GLchar) * 256, NULL, message);
-        printf("Link program error: %s\n", message);
-        exit(EXIT_FAILURE);
+        puts("Error compiling vertex shader");
+        // get error log from shader
+        char buffer[512];
+        glGetShaderInfoLog(*v_shader, 512, NULL, buffer);
+        printf("%s\n", buffer); 
     }
-    return program_id;
-}
+    // same thing for fragment shader
+    *f_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(*f_shader, 1, &fragment_shader, NULL);
+    glCompileShader(*f_shader);
+    glGetShaderiv(*f_shader, GL_COMPILE_STATUS, &status);
 
-void init_raster(Raster * raster_data, GLint program_id, GDALImage *image)
-{
-    // some shader magic
-    raster_data->position_slot = glGetAttribLocation(program_id, "Position1");
-    raster_data->color_slot = glGetAttribLocation(program_id, "SourceColor1");
-    raster_data->size = image->num_blocks.x * image->num_blocks.y; // TODO we won't always have block bounds, so this will need to be updated
-    glEnableVertexAttribArray(raster_data->position_slot);
-    glEnableVertexAttribArray(raster_data->color_slot);
-    //TODO stuff with raster objects
-}
-
-void render_raster(Raster *raster)
-{
-    int i;
-    glUniform1i(raster->color_slot, 0);
-    for(i = 0; i < raster->size; i++)
+    if(status != GL_TRUE)
     {
-        //TODO glBindBuffer
-        //TODO stuff with raster objects
+        puts("Error compiling fragment shader");
+        // get error log from shader
+        char buffer[512];
+        glGetShaderInfoLog(*f_shader, 512, NULL, buffer);
+        printf("%s\n", buffer); 
     }
+    // combine shaders into a program
+    *shader_program = glCreateProgram();
+    glAttachShader(*shader_program, *v_shader);
+    glAttachShader(*shader_program, *f_shader);
+    /*glBindFragDataLocation(*shader_program, 0, "outColor");*/
+    // link the program
+    glLinkProgram(*shader_program);
+    // tell opengl to use this program
+    glUseProgram(*shader_program);
+
+    // get position of the input position in vertex_shader
+    GLint posAttribute = glGetAttribLocation(*shader_program, "position"); // always 0 since it's the first and only arg
+    // (arg_position, number of values for that arg, type for each component, 
+    // should they be normalized?, distance (in bytes) between each position attribute,
+    // offset from start of array for first attribute value)
+    glVertexAttribPointer(posAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
+    // enable attribute array
+    glEnableVertexAttribArray(posAttribute);
 }
+
+void setup_texture(GLuint shader_program, GLFWwindow *window, 
+        const char *filepath, GDALImage *image, GLuint *tex)
+{
+    /*******************
+     *TEXTURE STUFF YAY*
+     *******************/
+    glGenTextures(1, tex); // generate one texture beginning at &tex
+    glBindTexture(GL_TEXTURE_2D, *tex); // set this texture as the current texture
+
+    // setup texture for use in shaders
+    GLint texAttribute = glGetAttribLocation(shader_program, "texCoord");
+    glVertexAttribPointer(texAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+    float color[] = { 1.0f, 0.0f, 1.0f, 0.8f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    /*********************************
+     *GET TEXTURE FROM GDAL IMAGE
+     *********************************/
+    sample(filepath, image, width, height);
+    // actually load a texture!
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // generate mip map
+    glGenerateMipmap(GL_TEXTURE_2D);
+    GLint texAttrib = glGetAttribLocation(shader_program, "texCoord");
+    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+    glEnableVertexAttribArray(texAttrib);
+
+}
+
+

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <time.h>
 #include "glhelper.h"
+#include "gdalreader.h"
 
 #ifdef win32
     #include <windows.h>
@@ -17,14 +18,11 @@
 const char *vertex_shader = 
 "#version 150\n" // declare version 1.5
 "in vec2 texCoord;"
-"in vec3 color;" // input color
 "in vec2 position;" // input is a 2d vector (X,Y)
-"out vec3 Color;" //output color to fragment shader
 "out vec2 TexCoord;"
 "void main()"
 "{"
     "TexCoord = texCoord;"
-    "Color = color;"
     "gl_Position = vec4(position, 0.0, 1.0);" // convert vec2 to vec4 and set it gl_position
 "}";
 
@@ -32,11 +30,11 @@ const char *fragment_shader =
 "#version 150\n"
 "uniform sampler2D tex;"
 "in vec2 TexCoord;"
-"in vec3 Color;"
 "out vec4 outColor;" // output a vec4 (r,g,b,a)
 "void main()"
 "{"
-    "outColor = texture(tex, TexCoord) * vec4(Color, 1.0);"
+    "vec4 tmp = texture2D(tex, TexCoord);"
+    "outColor = vec4(tmp.r, tmp.r, tmp.r, 1.0f);"
 "}"
 ;
 
@@ -46,11 +44,11 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
     glewInit();
     // create vertices simple triangle
     float vertices[] = {
-        //position    //color RGB       //texture coordinates
-        -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // top left 
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // top right
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // bottom-right
-        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // bottom-left
+        //position     //texture coordinates
+        -1.0f,  1.0f,  0.0f, 0.0f, // top left 
+         1.0f,  1.0f,  1.0f, 0.0f, // top right
+         1.0f, -1.0f,  1.0f, 1.0f, // bottom-right
+        -1.0f, -1.0f,  0.0f, 1.0f  // bottom-left
     };
 
     // create vertex array object for storing shader and attribute data
@@ -101,10 +99,9 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
         puts("Error compiling fragment shader");
         // get error log from shader
         char buffer[512];
-        glGetShaderInfoLog(*v_shader, 512, NULL, buffer);
+        glGetShaderInfoLog(*f_shader, 512, NULL, buffer);
         printf("%s\n", buffer); 
     }
-
     // combine shaders into a program
     *shader_program = glCreateProgram();
     glAttachShader(*shader_program, *v_shader);
@@ -120,17 +117,13 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
     // (arg_position, number of values for that arg, type for each component, 
     // should they be normalized?, distance (in bytes) between each position attribute,
     // offset from start of array for first attribute value)
-    glVertexAttribPointer(posAttribute, 2, GL_FLOAT, GL_FALSE, 7*sizeof(float), 0);
+    glVertexAttribPointer(posAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
     // enable attribute array
     glEnableVertexAttribArray(posAttribute);
-    // same for colors
-    GLint colorAttribute = glGetAttribLocation(*shader_program, "color");
-    glVertexAttribPointer(colorAttribute, 3, GL_FLOAT, GL_FALSE, 7*sizeof(float), (void*)(2*sizeof(float)));
-    glEnableVertexAttribArray(colorAttribute);
 }
 
 GLFWwindow *window;
-int main()
+int main(int argc, char** argv)
 {
     init_glfw(&window); // initialize openGL
     // In my case this isn't actually necessary which is kind of weird, but so it works
@@ -147,25 +140,46 @@ int main()
     GLuint tex;
     glGenTextures(1, &tex); // generate one texture beginning at &tex
     glBindTexture(GL_TEXTURE_2D, tex); // set this texture as the current texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // setup texture for use in shaders
     GLint texAttribute = glGetAttribLocation(shader_program, "texCoord");
-    glVertexAttribPointer(texAttribute, 2, GL_FLOAT, GL_FALSE, 7*sizeof(float), (void*)(5*sizeof(float)));
+    glVertexAttribPointer(texAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
     float color[] = { 1.0f, 0.0f, 1.0f, 0.8f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    /*********************************
+     *GET TEXTURE FROM GDAL IMAGE
+     *********************************/
+    GDALImage image;
+    sample(argv[1], &image, width, height);
+    int i, j;
+    long max = width * height;
+    long index;
+    /*
+     *for(i = 0; i < max; i++)
+     *{
+     *    image.data[i] = image.data[i]/255.0f;
+     *}
+     */
     // actually load a texture!
     float pixels[] = {
-        0.0f, 1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f
+        1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 
+        1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 
+        1, 0, 1, 0, 1, 1, 1, 0, 0, 0,
+        1, 1, 0, 0, 1, 0, 1, 0, 0, 0
     };
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image.data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // generate mip map
     glGenerateMipmap(GL_TEXTURE_2D);
     GLint texAttrib = glGetAttribLocation(shader_program, "texCoord");
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 7*sizeof(float), (void*)(5*sizeof(float)));
+    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
     glEnableVertexAttribArray(texAttrib);
 
     // main loop
@@ -179,6 +193,7 @@ int main()
     }
     glfwDestroyWindow(window); // make sure the window is closed
     // cleanup
+    CPLFree(image.data);
     glDeleteTextures(1, &tex);
     glDeleteProgram(shader_program);
     glDeleteShader(v_shader);

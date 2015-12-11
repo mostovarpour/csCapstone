@@ -5,16 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "gdalreader.h"
-struct Raster 
-{
-    GLint position_slot;
-    GLint color_slot;
-    int size;
-};
-
-
-typedef struct Raster Raster;
-GLint init_shaders(); // initializes the shaders and returns the program_id
-void init_raster(Raster*, GLint program_id, GDALImage *image);
-void render_raster(Raster*);
+void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program);
+void setup_texture(GLuint shader_program, GLFWwindow *window, 
+        const char *filepath, GDALImage *image, GLuint *tex);
 #endif
