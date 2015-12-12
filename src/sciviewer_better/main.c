@@ -1,3 +1,4 @@
+#include "os.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -8,12 +9,6 @@
 #include "glhelper.h"
 #include "gdalreader.h"
 #include "raster.h"
-
-#ifdef win32
-    #include <windows.h>
-#else
-    #include <pthread.h>
-#endif 
 GLFWwindow *window;
 int main(int argc, char** argv)
 {
