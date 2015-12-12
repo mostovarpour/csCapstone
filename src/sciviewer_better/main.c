@@ -1,4 +1,3 @@
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -41,7 +40,7 @@ int main(int argc, char** argv)
     }
     glfwDestroyWindow(window); // make sure the window is closed
     // cleanup
-    CPLFree(image.data);
+    CPLFree(image.band1);
     glDeleteTextures(1, &tex);
     glDeleteProgram(shader_program);
     glDeleteShader(v_shader);

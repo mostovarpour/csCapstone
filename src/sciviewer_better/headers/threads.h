@@ -1,9 +1,9 @@
 #ifndef __THREADS_H__
 #define __THREADS_H__
 // Get thread functions based on OS
-#define WINDOWS defined _WIN32 || defined _WIN64
 
-#if WINDOWS
+#if defined _WIN32 || defined _WIN64
+    #define WINDOWS
     #include <Windows.h>
 #else
     #include <pthread.h>

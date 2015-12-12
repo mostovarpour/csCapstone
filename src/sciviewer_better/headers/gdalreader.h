@@ -8,6 +8,7 @@
 #include "gdal.h"
 #include "cpl_conv.h" /* for CPLMalloc() */
 #include "errcheck.h"
+#include "threads.h"
 
 #define DEFAULT_AVG_SAMPLE_COUNT 25
 
@@ -30,15 +31,12 @@ typedef struct GDALImageData
     Point block_size;
     Point num_blocks;
     Point output_size;
-    GByte *data;
+    GByte *band1;
+    GByte *band2;
+    GByte *band3;
 } GDALImage;
-typedef struct sample_parms
+typedef struct thread_params
 {
-    char *filepath;
-    int x_low;
-    int y_low;
-    int x_high;
-    int y_high;
 } sample_parameters;
 
 typedef int GDALResult;

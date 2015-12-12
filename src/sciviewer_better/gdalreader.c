@@ -71,7 +71,7 @@ void downsample(GDALImage *image, int width, int height)
             exit(EXIT_FAILURE);
         }
         puts("image read");
-        image->data = data;
+        image->band1 = data;
     }
 }
 
