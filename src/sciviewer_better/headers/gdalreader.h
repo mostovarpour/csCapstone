@@ -1,5 +1,6 @@
 #ifndef __PROBABILISTIC_H__
 #define __PROBABILISTIC_H__
+#include "os.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
