@@ -10,6 +10,8 @@ void fill_image_data(GDALImage *image)
     GDALResult result;
     // Open GDAL File
     image->dataset = GDALOpen(image->filepath, GA_ReadOnly);
+    //TODO don't actually fail, simply 
+    //throw an error gracefully and continue running
     FAILIF(image->dataset, NULL, "Unable to open file.");
     // Get file information
     image->driver         = GDALGetDatasetDriver(image->dataset);
@@ -22,15 +24,15 @@ void fill_image_data(GDALImage *image)
     result = GDALGetGeoTransform(image->dataset, image->geo_transform);
     FAILIF(result, CE_Failure, "Failed to get GeoTransform data");
     GDALGetBlockSize(image->current_band, &image->block_size.x, &image->block_size.y);
-    image->output_size.x = image->block_size.x/image->scale;
-    image->output_size.y = image->block_size.y/image->scale;
     image->num_blocks.x = image->original_width/image->block_size.x;
     image->num_blocks.y = image->original_height/image->block_size.y;
-
     DEFAULT(image->num_blocks.x, 0, 1);
     DEFAULT(image->num_blocks.y, 0, 1);
-    DEFAULT(image->output_size.x, 0, 1);
-    DEFAULT(image->output_size.y, 0, 1);
+    int i;
+    for(i = 0; i < image->band_count; i++)
+    {
+        image->is_sampling[i] = false;
+    }
 }
 
 void print_file_information(GDALImage *image) 
@@ -42,12 +44,14 @@ void print_file_information(GDALImage *image)
     printf("Pixel Size = (%.6f,%.6f)\n", image->geo_transform[1], image->geo_transform[5]);
     printf("X Block size = %d\n", image->block_size.x);
     printf("Y Block size = %d\n", image->block_size.y);
-    printf("X output size = %d\n", image->output_size.x);
-    printf("Y output size = %d\n", image->output_size.y);
     printf("X Blocks = %d\n", image->num_blocks.x);
     printf("Y Blocks = %d\n", image->num_blocks.y);
 }
 
+///<summary>
+///Doesn't actually downsample, well, it does, but the magic happens in rasterio
+/// we may have to really get into GDAL to get the downsampling working the way we want it
+///</summary>
 void downsample(GDALImage *image, int width, int height)
 {
     if(GDALGetRasterDataType(image->current_band) == GDT_Int16)
@@ -57,32 +61,75 @@ void downsample(GDALImage *image, int width, int height)
     }
     else
     {
-        // Allocate space for 1 value for each screen pixel
-        GByte *data = (GByte *) CPLMalloc(sizeof(GByte) * width * height); 
-        long x, y;
-        x = GDALGetRasterBandXSize(image->current_band);
-        y = GDALGetRasterBandYSize(image->current_band);
-        GDALResult result = GDALRasterIO(image->current_band, GF_Read, 
-                0, 0, x, y,
-                data, width, height, GDT_Byte, 0, 0);
-        if(result == CE_Failure)
+        int i;
+        // prepare threads
+        // can't have image->band_count inside [] to declare array
+        thread_params **thread_parameters = malloc(sizeof(thread_params *) * image->band_count); 
+        thread *threads = malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
+        // set up thread parameters
+        for(i = 0; i < image->band_count; i++)
         {
-            fprintf(stderr, "Failed to read band");
-            exit(EXIT_FAILURE);
+            // allocate space for band info
+            image->bands[i] = (GByte *) CPLMalloc(sizeof(GByte) * width * height);
+            // get space for the thread params, can't just
+            // get memory from the stack since as soon as
+            // this function ends the stack memory will be freed
+            // and the threads won't have access anymore
+            thread_parameters[i] = (thread_params *)malloc(sizeof(thread_params));
+            thread_parameters[i]->width = width;
+            thread_parameters[i]->height = height;
+            thread_parameters[i]->buffer = image->bands[i];
+            thread_parameters[i]->band = GDALGetRasterBand(image->dataset, i+1);
+            thread_parameters[i]->is_sampling = &image->is_sampling[i];
+            thread_parameters[i]->image = image;
+            image->is_sampling[i] = true;
         }
-        puts("image read");
-        image->band1 = data;
+        // create a thread for reading the image
+        for(i = 0; i < image->band_count; i++)
+        {
+            create_thread(threads[i], fill_band, (thread_arg)(thread_parameters[i]));
+        }
+        free(thread_parameters); // free the dynamic array, the actual pointers in the array are still out there
+        free(threads);
     }
 }
 
-// prepare for downsampling
-void sample(const char* filepath, GDALImage *image, int width, int height) 
+thread_func fill_band(thread_arg params)
 {
-    // Get file information
-    image->filepath = filepath;
-    image->scale = 1;
-    fill_image_data(image);
-    //TODO create and call downsampling function
+    thread_params *in = (thread_params*)params;
+    lock_mutex(resource_mutex);
+    int width, height;
+    width = GDALGetRasterBandXSize(in->band);
+    height = GDALGetRasterBandYSize(in->band);
+    GDALResult result = GDALRasterIO(in->band, GF_Read, 
+            0, 0, width, height,
+            in->buffer, in->width, in->height, GDT_Byte, 0, 0);
+    if(result == CE_Failure)
+    {
+        fprintf(stderr, "Failed to read band\n");
+    }
+    // free memory allocated before threads were created 
+    *in->is_sampling = false;
+    if(!is_sampling(in->image))
+        in->image->ready_to_upload = true;
+    release_mutex(resource_mutex);
+    free(params);
+    return 0;
+}
+
+void sample(GDALImage *image, int width, int height) 
+{
+    // break if still not finished from last sampling
+    // call
+    bool sampling = is_sampling(image);
+    // if we're sampling, ready to upload should be false
+    if (sampling || image->ready_to_upload)
+    {
+        return;
+    }
+    // otherwise if we're not sampling and ready to upload
+    // break if the image hasn't yet been uploaded to the gpu.
+    // don't want to overwrite the buffer yet
     downsample(image, width, height);
 
     // Print information about the file
@@ -91,4 +138,40 @@ void sample(const char* filepath, GDALImage *image, int width, int height)
     puts("--------------------------------------------------------------------");
 }
 
+// initialize is sampling and any other
+// variables that should be defaulted and return the pointer
+GDALImage *create_gdal_image(char *filepath)
+{
+    GDALImage *image =(GDALImage *) malloc(sizeof(GDALImage));
+    image->filepath = filepath;
+    image->ready_to_upload = false;
+    image->should_sample = true;
+    fill_image_data(image);
+    return image;
+}
 
+void destroy_gdal_image(GDALImage *image)
+{
+    int i;
+    // if the image is still sampling wait for it to finish
+    // otherwise the program will segfault
+    while(is_sampling(image));
+    // free allocated band space
+    for(i = 0; i < image->band_count; i++)
+    {
+        CPLFree(image->bands[i]);
+    }
+    // free allocated struct
+    free(image);
+}
+
+bool is_sampling(GDALImage *image)
+{
+    int i;
+    for(i = 0; i < image->band_count; i++)
+    {
+        if(image->is_sampling[i])
+            return true;
+    }
+    return false;
+}

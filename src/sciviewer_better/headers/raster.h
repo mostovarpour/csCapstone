@@ -7,6 +7,6 @@
 #include <stdio.h>
 #include "gdalreader.h"
 void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program);
-void setup_texture(GLuint shader_program, GLFWwindow *window, 
-        const char *filepath, GDALImage *image, GLuint *tex);
+void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex);
+void check_texture(GDALImage *, GLFWwindow *, GLuint *);
 #endif
