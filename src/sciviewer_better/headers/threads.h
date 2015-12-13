@@ -39,37 +39,37 @@
 
 // Define mutex object for shared resources
 #ifdef WINDOWS
-	#define Mutex HANDLE
+    #define Mutex HANDLE
 #else
-	#define Mutex pthread_mutex_t
+    #define Mutex pthread_mutex_t
 #endif
 
 // Define create_mutex function
 #ifdef WINDOWS
-	#define init_mutex(mutex_obj) mutex_obj = CreateMutex(NULL, FALSE, NULL)
+    #define init_mutex(mutex_obj) mutex_obj = CreateMutex(NULL, FALSE, NULL)
 #else
-	#define init_mutex(mutex_obj) pthread_mutex_init(&mutex_obj, NULL)
+    #define init_mutex(mutex_obj) pthread_mutex_init(&mutex_obj, NULL)
 #endif
 
 // Define lock mutex function
 #ifdef WINDOWS
-	#define lock_mutex(mutex) WaitForSingleObject(mutex, INFINITE)
+    #define lock_mutex(mutex) WaitForSingleObject(mutex, INFINITE)
 #else
-	#define lock_mutex(mutex) pthread_mutex_lock(&mutex)
+    #define lock_mutex(mutex) pthread_mutex_lock(&mutex)
 #endif
 
 // Define release mutex
 #ifdef WINDOWS
-	#define release_mutex(mutex) ReleaseMutex(mutex);
+    #define release_mutex(mutex) ReleaseMutex(mutex);
 #else
-	#define release_mutex(mutex) pthread_mutex_unlock(&mutex);
+    #define release_mutex(mutex) pthread_mutex_unlock(&mutex);
 #endif
 
 // Define destroy mutex
 #ifdef WINDOWS
-	#define destroy_mutex(mutex) CloseHandle(mutex)
+    #define destroy_mutex(mutex) CloseHandle(mutex)
 #else
-	#define destroy_mutex(mutex) pthread_mutex_destroy(&mutex)
+    #define destroy_mutex(mutex) pthread_mutex_destroy(&mutex)
 #endif
 
 #undef WINDOWS
