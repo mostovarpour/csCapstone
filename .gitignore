@@ -1,12 +1,11 @@
-Debug
-Release
-Ubuntu/build
+Debug/
+Release/
+debug/
+release/
+build/
 *.user
 *.opensdf
 *.sdf
 *.suo
 *.filters
-*/build
-*/debug
-*/release
 .*
