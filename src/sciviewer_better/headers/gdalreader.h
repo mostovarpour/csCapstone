@@ -20,32 +20,40 @@ typedef struct coordinates {
 
 typedef struct GDALImageData
 {
-    const char *filepath;
-    int scale;
-    GDALDatasetH dataset;
-    GDALDriverH  driver;
-    GDALRasterBandH current_band;
-    int original_width;
-    int original_height;
+    const char *filepath; // path to image
+    GDALDatasetH dataset; // gdal dataset
+    GDALDriverH  driver; // driver for the image
+    GDALRasterBandH current_band; // current raster band
+    int original_width; // image width in pixels
+    int original_height; // image height in pixels
     int band_count; // limited to 3 or less
-    double geo_transform[6];
-    Point block_size;
-    Point num_blocks;
-    Point output_size;
-    GByte *band1;
-    GByte *band2;
-    GByte *band3;
+    double geo_transform[6]; // transform data
+    Point block_size; // x and y block size
+    Point num_blocks; // num of x and y blocks
+    GByte *bands[3]; // pointers to band pixel data
+    bool is_sampling[3]; // store which bands are currently being sampled
+    bool volatile should_sample; // flag determing if the image should be resampled
+    bool volatile ready_to_upload; // boolean which signals that each band has finished loading and is ready to be sent to the gpu
 } GDALImage;
 typedef struct thread_params
 {
-} sample_parameters;
+    GByte *buffer;
+    GDALImage *image;
+    GDALRasterBandH band;
+    int width;
+    int height;
+    bool *is_sampling;
+} thread_params;
 
 typedef int GDALResult;
 
 int limit_band_count(int BandCount);
-void sample(const char* filepath, GDALImage *, int width, int height);
+void sample(GDALImage *, int width, int height);
 void print_file_information(GDALImage *);
 // Requires that the filepath of GDALImage is already set
 void fill_image_data(GDALImage *);
-void fill_bands(GDALImage *);
+GDALImage *create_gdal_image(char *filepath);
+void destroy_gdal_image(GDALImage *);
+thread_func fill_band(void *);
+bool is_sampling(GDALImage *);
 #endif

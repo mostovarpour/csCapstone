@@ -20,7 +20,7 @@
 #ifdef WINDOWS
     #define thread_func DWORD WINAPI
 #else
-    #define thread_func void
+    #define thread_func void*
 #endif
 
 // Thread Argument type

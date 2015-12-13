@@ -105,42 +105,53 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
     glVertexAttribPointer(posAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
     // enable attribute array
     glEnableVertexAttribArray(posAttribute);
+    GLint texAttrib = glGetAttribLocation(*shader_program, "texCoord");
+    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+    glEnableVertexAttribArray(texAttrib);
 }
 
-void setup_texture(GLuint shader_program, GLFWwindow *window, 
-        const char *filepath, GDALImage *image, GLuint *tex)
+void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
 {
     /*******************
      *TEXTURE STUFF YAY*
      *******************/
+    glDeleteTextures(1, tex);
     glGenTextures(1, tex); // generate one texture beginning at &tex
     glBindTexture(GL_TEXTURE_2D, *tex); // set this texture as the current texture
-
-    // setup texture for use in shaders
-    GLint texAttribute = glGetAttribLocation(shader_program, "texCoord");
-    glVertexAttribPointer(texAttribute, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
-    float color[] = { 1.0f, 0.0f, 1.0f, 0.8f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     /*********************************
      *GET TEXTURE FROM GDAL IMAGE
      *********************************/
-    sample(filepath, image, width, height);
+    sample(image, width, height);
+    // if the image isn't ready then there's no point
+    if(!image->ready_to_upload)
+        return;
+    puts("uploading to gpu");
     // actually load a texture!
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->band1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->bands[0]);
+    image->ready_to_upload = false;
     // generate mip map
     glGenerateMipmap(GL_TEXTURE_2D);
-    GLint texAttrib = glGetAttribLocation(shader_program, "texCoord");
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
-    glEnableVertexAttribArray(texAttrib);
-
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
+void check_texture(GDALImage *image, GLFWwindow *window, GLuint *tex)
+{
+    // check if we're still sampling
+    /*
+     *int i;
+     *for(i = 0; i < image->band_count; i++)
+     *{
+     *    if(image->is_sampling[i])
+     *        return;
+     *}
+     */
+    // no sampling, time to read it again
+        setup_texture(window, image, tex);
+}
 

@@ -19,14 +19,12 @@ int main(int argc, char** argv)
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
     GLuint vao, ebo, vbo, v_shader, f_shader, shader_program, tex;
-    GDALImage image;
+    GDALImage *image = create_gdal_image(argv[1]);
     setup_polygons(&vao, &ebo, &vbo, &v_shader, &f_shader, &shader_program);
-    setup_texture(shader_program, window, argv[1], &image, &tex);
-
-
     // main loop
     while(!glfwWindowShouldClose(window))
     {
+        check_texture(image, window, &tex);
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -35,7 +33,7 @@ int main(int argc, char** argv)
     }
     glfwDestroyWindow(window); // make sure the window is closed
     // cleanup
-    CPLFree(image.band1);
+    destroy_gdal_image(image);
     glDeleteTextures(1, &tex);
     glDeleteProgram(shader_program);
     glDeleteShader(v_shader);
