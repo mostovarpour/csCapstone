@@ -87,6 +87,7 @@
     <ClInclude Include="..\..\src\sciviewer_better\headers\glhelper.h" />
     <ClInclude Include="..\..\src\sciviewer_better\headers\os.h" />
     <ClInclude Include="..\..\src\sciviewer_better\headers\raster.h" />
+    <ClInclude Include="..\..\src\sciviewer_better\headers\threads.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
