@@ -10,9 +10,17 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\sciviewer_better\headers\gdalreader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\sciviewer_better\gdalreader.c" />
+    <ClCompile Include="..\..\src\sciviewer_better\testing\test.c" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C5BB435E-044D-40CC-9B06-333BBFAD454C}</ProjectGuid>
-    <RootNamespace>WindowsSciviewerBetter</RootNamespace>
+    <ProjectGuid>{A57E7A4F-488B-42ED-8425-B4B401FE5B74}</ProjectGuid>
+    <RootNamespace>Project1</RootNamespace>
+    <ProjectName>DanielTesting</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -51,11 +59,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);gdal_i.lib;glfw3.lib;glew32.lib;glu32.lib;opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>gdal_i.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -65,30 +72,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);gdal_i.lib;glfw3.lib;glew32.lib;glu32.lib;opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>gdal_i.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\sciviewer_better\gdalreader.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\glhelper.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\main.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\raster.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\sciviewer_better\headers\err.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\errcheck.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\gdalreader.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\glhelper.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\os.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\raster.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\threads.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

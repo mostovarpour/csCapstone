@@ -112,6 +112,10 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
 
 void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
 {
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+	sample(image, width, height);
+    // if the image isn't ready then there's no point
     if(!image->ready_to_upload)
         return;
     /*******************
@@ -120,15 +124,12 @@ void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
     glDeleteTextures(1, tex);
     glGenTextures(1, tex); // generate one texture beginning at &tex
     glBindTexture(GL_TEXTURE_2D, *tex); // set this texture as the current texture
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
     /*********************************
      *GET TEXTURE FROM GDAL IMAGE
      *********************************/
-    // if the image isn't ready then there's no point
-    puts("uploading to gpu");
     // actually load a texture!
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->bands[0]);
+	// flag the image to be sampled again
     image->ready_to_upload = false;
     // generate mip map
     glGenerateMipmap(GL_TEXTURE_2D);

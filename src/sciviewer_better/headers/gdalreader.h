@@ -11,14 +11,20 @@
 #include "errcheck.h"
 #include "threads.h"
 
-#define DEFAULT_AVG_SAMPLE_COUNT 25
-
-typedef struct coordinates {
+/***********
+ * STRUCTS *
+ ***********/
+struct Point {
     int x;
     int y;
-} Point;
+};
 
-typedef struct GDALImageData
+///<summary>
+///Simple struct with x, y for coordinates or any other 2 point values
+///</summary>
+typedef struct Point Point;
+
+struct GDALImageData
 {
     const char *filepath; // path to image
     GDALDatasetH dataset; // gdal dataset
@@ -34,8 +40,13 @@ typedef struct GDALImageData
     bool is_sampling[3]; // store which bands are currently being sampled
     bool volatile should_sample; // flag determing if the image should be resampled
     bool volatile ready_to_upload; // boolean which signals that each band has finished loading and is ready to be sent to the gpu
-} GDALImage;
-typedef struct thread_params
+};
+///<summary>
+///A struct to hold all the data on a single image.
+///</summary>
+typedef struct GDALImageData GDALImage;
+
+struct thread_params
 {
     GByte *buffer;
     GDALImage *image;
@@ -43,17 +54,43 @@ typedef struct thread_params
     int width;
     int height;
     bool *is_sampling;
-} thread_params;
+};
 
+///<summary>
+///Struct to pass to thread functions
+///</summary>
+typedef struct thread_params thread_params;
+
+/******************
+ * END OF STRUCTS *
+ ******************/
+
+
+
+
+
+///<summary>
+///Simple alias for int for usage where gdal returns a CE_None or CE_Failure, etc
+///</summary>
 typedef int GDALResult;
-
+///<summary>
+///Function that returns 3 if the number is > 3
+///Otherwise just returns the number
+///</summary>
 int limit_band_count(int BandCount);
+///<summary>
+///Calls the downsampling function
+///or just returns if the image is already being sampled
+///</summary>
 void sample(GDALImage *, int width, int height);
 void print_file_information(GDALImage *);
 // Requires that the filepath of GDALImage is already set
 void fill_image_data(GDALImage *);
 GDALImage *create_gdal_image(char *filepath);
 void destroy_gdal_image(GDALImage *);
-thread_func fill_band(void *);
+thread_func fill_band(thread_arg);
 bool is_sampling(GDALImage *);
+
+// Mutex from main.c
+extern Mutex resource_mutex;
 #endif

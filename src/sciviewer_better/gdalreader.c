@@ -48,8 +48,10 @@ void print_file_information(GDALImage *image)
     printf("Y Blocks = %d\n", image->num_blocks.y);
 }
 
-// Doesn't actually downsample, well, it does, but the magic happens in rasterio
-// we may have to really get into GDAL to get the downsampling working the way we want it
+///<summary>
+///Doesn't actually downsample, well, it does, but the magic happens in rasterio
+/// we may have to really get into GDAL to get the downsampling working the way we want it
+///</summary>
 void downsample(GDALImage *image, int width, int height)
 {
     if(GDALGetRasterDataType(image->current_band) == GDT_Int16)
@@ -61,8 +63,9 @@ void downsample(GDALImage *image, int width, int height)
     {
         int i;
         // prepare threads
-        thread_params *thread_parameters[image->band_count];
-        thread threads[image->band_count];
+		// can't have image->band_count inside [] to declare array
+		thread_params **thread_parameters = malloc(sizeof(thread_params *) * image->band_count); 
+        thread *threads = malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
         // set up thread parameters
         for(i = 0; i < image->band_count; i++)
         {
@@ -86,12 +89,15 @@ void downsample(GDALImage *image, int width, int height)
         {
             create_thread(threads[i], fill_band, (thread_arg)(thread_parameters[i]));
         }
+		free(thread_parameters); // free the dynamic array, the actual pointers in the array are still out there
+		free(threads);
     }
 }
 
-void *fill_band(void* params)
+thread_func fill_band(thread_arg params)
 {
     thread_params *in = (thread_params*)params;
+	lock_mutex(resource_mutex);
     int width, height;
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
@@ -100,26 +106,27 @@ void *fill_band(void* params)
             in->buffer, in->width, in->height, GDT_Byte, 0, 0);
     if(result == CE_Failure)
     {
-        fprintf(stderr, "Failed to read band");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Failed to read band\n");
     }
     // free memory allocated before threads were created 
     *in->is_sampling = false;
     if(!is_sampling(in->image))
         in->image->ready_to_upload = true;
+	release_mutex(resource_mutex);
     free(params);
+	return 0;
 }
 
-// prepare for downsampling
 void sample(GDALImage *image, int width, int height) 
 {
     // break if still not finished from last sampling
     // call
     bool sampling = is_sampling(image);
     // if we're sampling, ready to upload should be false
-    printf("%d %d %d\n", sampling, image->should_sample, image->ready_to_upload);
-    if(sampling || image->ready_to_upload)
+	if (sampling || image->ready_to_upload)
+	{
         return;
+	}
     // otherwise if we're not sampling and ready to upload
     // break if the image hasn't yet been uploaded to the gpu.
     // don't want to overwrite the buffer yet
