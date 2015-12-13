@@ -1,8 +1,8 @@
-#include "gdalreader.h"
-#include "gdal.h"
-#include "cpl_conv.h"
+#include <GDAL/gdal.h>
+#include <GDAL/gdal.h>
 #include "os.h"
 #include "threads.h"
+#include "gdalreader.h"
 
 typedef struct params 
 {
@@ -13,13 +13,13 @@ typedef struct params
     int height;
     bool *is_sampling;
 } params;
-Mutex mutex;
+Mutex resource_mutex;
 
 thread_func my_thread_function(thread_arg arg)
 {
 	// convert from void pointer to params pointer
 	params *parameters = (params *)arg; 
-lock_mutex(mutex);
+lock_mutex(resource_mutex);
 	int width, height;
 	width = GDALGetRasterBandXSize(parameters->band);
 	height = GDALGetRasterBandYSize(parameters->band);
@@ -28,14 +28,14 @@ lock_mutex(mutex);
 		fprintf(stderr, "Failed to read band\n");
 	*parameters->is_sampling = false;
 	// free the malloced struct
-release_mutex(mutex);
+release_mutex(resource_mutex);
 	free(parameters);
 	return 0;
 }
 
 int main()
 {
-	create_mutex(mutex);
+	init_mutex(resource_mutex);
 	GDALImage *image = create_gdal_image("C:\\Users\\Danny\\Desktop\\VBOXSHARED\\colorhillshade_mola128_mola64_merge_90Nto90S_Simp_clon0.tif");
 	fill_image_data(image);
 	int i;
@@ -86,7 +86,7 @@ int main()
 			continue;
 		break;
 	}
-	destroy_mutex(mutex);
+	destroy_mutex(resource_mutex);
 	destroy_gdal_image(image);
 	return 0;
 }

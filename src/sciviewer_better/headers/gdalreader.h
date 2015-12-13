@@ -6,8 +6,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <GL/gl.h>
-#include "gdal.h"
-#include "cpl_conv.h" /* for CPLMalloc() */
+#include <GDAL/gdal.h>
+#include <GDAL/cpl_conv.h>
 #include "errcheck.h"
 #include "threads.h"
 
