@@ -3,8 +3,8 @@
 	#include <Windows.h>
 #else
 	#include <pthread.h>
+#endif
 // boolean type
 typedef unsigned char bool;
 #define false 0
 #define true 1
-#endif
