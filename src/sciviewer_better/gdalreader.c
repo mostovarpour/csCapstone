@@ -153,6 +153,9 @@ GDALImage *create_gdal_image(char *filepath)
 void destroy_gdal_image(GDALImage *image)
 {
     int i;
+    // if the image is still sampling wait for it to finish
+    // otherwise the program will segfault
+    while(is_sampling(image));
     // free allocated band space
     for(i = 0; i < image->band_count; i++)
     {
