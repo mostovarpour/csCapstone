@@ -112,22 +112,20 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
 
 void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
 {
+    if(!image->ready_to_upload)
+        return;
     /*******************
      *TEXTURE STUFF YAY*
      *******************/
     glDeleteTextures(1, tex);
     glGenTextures(1, tex); // generate one texture beginning at &tex
     glBindTexture(GL_TEXTURE_2D, *tex); // set this texture as the current texture
-
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     /*********************************
      *GET TEXTURE FROM GDAL IMAGE
      *********************************/
-    sample(image, width, height);
     // if the image isn't ready then there's no point
-    if(!image->ready_to_upload)
-        return;
     puts("uploading to gpu");
     // actually load a texture!
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->bands[0]);

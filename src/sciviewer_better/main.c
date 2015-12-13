@@ -21,6 +21,9 @@ int main(int argc, char** argv)
     GLuint vao, ebo, vbo, v_shader, f_shader, shader_program, tex;
     GDALImage *image = create_gdal_image(argv[1]);
     setup_polygons(&vao, &ebo, &vbo, &v_shader, &f_shader, &shader_program);
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    sample(image, width, height);
     // main loop
     while(!glfwWindowShouldClose(window))
     {
