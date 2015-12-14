@@ -33,6 +33,10 @@ void fill_image_data(GDALImage *image)
     {
         image->is_sampling[i] = false;
     }
+    // Print information about the file
+    puts("--------------------------------------------------------------------");
+    print_file_information(image);
+    puts("--------------------------------------------------------------------");
 }
 
 void print_file_information(GDALImage *image) 
@@ -132,10 +136,6 @@ void sample(GDALImage *image, int width, int height)
     // don't want to overwrite the buffer yet
     downsample(image, width, height);
 
-    // Print information about the file
-    puts("--------------------------------------------------------------------");
-    print_file_information(image);
-    puts("--------------------------------------------------------------------");
 }
 
 // initialize is sampling and any other
