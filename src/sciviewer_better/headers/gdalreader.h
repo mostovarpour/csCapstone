@@ -7,7 +7,7 @@
 #include <string.h>
 #include <GL/gl.h>
 #include <GDAL/gdal.h>
-#include <GDAL/cpl_conv.h>
+#include <GDAL/cpl_conv.h> /* for CPLMalloc() */
 #include "errcheck.h"
 #include "threads.h"
 

@@ -1,5 +1,6 @@
 #include "raster.h"
 
+//TODO move these shaders into GLSL files and load them in that way
 const char *vertex_shader = 
 "#version 150\n" // declare version 1.5
 "in vec2 texCoord;"
@@ -13,18 +14,20 @@ const char *vertex_shader =
 
 const char *fragment_shader =
 "#version 150\n"
-"uniform sampler2D tex;"
+"uniform sampler2D tex[3];"
 "in vec2 TexCoord;"
 "out vec4 outColor;" // output a vec4 (r,g,b,a)
 "void main()"
 "{"
-    "vec4 tmp = texture2D(tex, TexCoord);"
-    "outColor = vec4(tmp.r, tmp.r, tmp.r, 1.0f);"
+"   vec4 tmpr = texture2D(tex[0], TexCoord);"
+"   vec4 tmpg = texture2D(tex[1], TexCoord);"
+"   vec4 tmpb = texture2D(tex[2], TexCoord);"
+"   outColor = vec4(tmpr.r, tmpg.r, tmpb.r, 1.0f);"
 "}"
 ;
 
 // pass in pointers so we can free the memory in the gpu later
-void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program) 
+void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint *vertex_buffer, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program) 
 {
     glewInit();
     // create vertices simple triangle
@@ -37,14 +40,14 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
     };
 
     // create vertex array object for storing shader and attribute data
-    glGenVertexArrays(1, vao);
-    glBindVertexArray(*vao);
+    glGenVertexArrays(1, vertex_attribute_obj);
+    glBindVertexArray(*vertex_attribute_obj);
 
 
     // create vertex buffer
-    glGenBuffers(1, vbo); // generate one buffer
+    glGenBuffers(1, vertex_buffer); // generate one buffer
     // make this buffer the "active" buffer
-    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, *vertex_buffer);
     // put vertices into the buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -53,8 +56,8 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
         0, 1, 2,
         2, 3, 0
     };
-    glGenBuffers(1, ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ebo);
+    glGenBuffers(1, element_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *element_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
     // create vertex shader
     *v_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -110,7 +113,7 @@ void setup_polygons(GLuint *vao, GLuint *ebo, GLuint *vbo, GLuint *v_shader, GLu
     glEnableVertexAttribArray(texAttrib);
 }
 
-void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
+void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLuint shader)
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -121,22 +124,39 @@ void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex)
     /*******************
      *TEXTURE STUFF YAY*
      *******************/
-    glDeleteTextures(1, tex);
-    glGenTextures(1, tex); // generate one texture beginning at &tex
-    glBindTexture(GL_TEXTURE_2D, *tex); // set this texture as the current texture
-    /*********************************
-     *GET TEXTURE FROM GDAL IMAGE
-     *********************************/
-    // actually load a texture!
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->bands[0]);
-    // flag the image to be sampled again
+    // delete old textures
+    glDeleteTextures(image->band_count, tex_buffer);
+    // generate new textures, one for each band
+    glGenTextures(image->band_count, tex_buffer);
+
+    // loop through textures and apply them to the shader
+    int i;
+    for (i = 0; i < image->band_count; i++)
+    {
+        glBindTexture(GL_TEXTURE_2D, tex_buffer[i]); // set this texture as the current texture
+        // load in texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image->bands[i]);
+        // generate mip map
+        glGenerateMipmap(GL_TEXTURE_2D);
+        // set gpu sampling parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    }
+    char shader_location[10];
+    // This needs to come after loading the textures, I don't fully understand why...
+    for (i = 0; i < image->band_count; i++)
+    {
+        sprintf(shader_location, "tex[%d]", i);
+        GLint tex_loc;
+        tex_loc = glGetUniformLocation(shader, shader_location);
+        glUniform1i(tex_loc, i);
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, tex_buffer[i]);
+    }
     image->ready_to_upload = false;
-    // generate mip map
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 void check_texture(GDALImage *image, GLFWwindow *window, GLuint *tex)
@@ -151,6 +171,5 @@ void check_texture(GDALImage *image, GLFWwindow *window, GLuint *tex)
      *}
      */
     // no sampling, time to read it again
-        setup_texture(window, image, tex);
 }
 
