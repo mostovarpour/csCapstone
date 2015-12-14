@@ -149,7 +149,7 @@ void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLu
     // This needs to come after loading the textures, I don't fully understand why...
     for (i = 0; i < image->band_count; i++)
     {
-        sprintf_s(shader_location, sizeof(shader_location), "tex[%d]", i);
+        sprintf(shader_location, "tex[%d]", i);
         GLint tex_loc;
         tex_loc = glGetUniformLocation(shader, shader_location);
         glUniform1i(tex_loc, i);
