@@ -28,7 +28,7 @@ lock_mutex(resource_mutex);
 		fprintf(stderr, "Failed to read band\n");
 	*parameters->is_sampling = false;
 	// free the malloced struct
-release_mutex(resource_mutex);
+    release_mutex(resource_mutex);
 	free(parameters);
 	return 0;
 }
