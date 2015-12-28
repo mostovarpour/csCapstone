@@ -5,8 +5,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include "lod2.h"
-#include "gdal.h"
-#include "cpl_conv.h" /* for CPLMalloc() */
+#include <GDAL/gdal.h>
+#include <GDAL/cpl_conv.h>
 #include "errcheck.h"
 
 #define DEFAULT_AVG_SAMPLE_COUNT 25

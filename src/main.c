@@ -9,10 +9,13 @@
 #include "glhelper.h"
 #include "gdalreader.h"
 #include "raster.h"
+#include "args.h"
 GLFWwindow *window;
 Mutex resource_mutex;
+int screen_width, screen_height;
 int main(int argc, char** argv)
 {
+    check_parameters(argc, argv);
     // initialize openGL
     init_glfw(&window); 
     // setup glew for most recent openGL functions
@@ -26,14 +29,13 @@ int main(int argc, char** argv)
     //TODO give this function a better name
     setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program);
     // Declare variables to store window size
-    int width, height;
     // Initialize the mutex
     init_mutex(resource_mutex);
     // main loop
     while(!glfwWindowShouldClose(window))
     {
         // Update the window size
-        glfwGetWindowSize(window, &width, &height);
+        glfwGetWindowSize(window, &screen_width, &screen_height);
         // Resample the texture
         setup_texture(window, image, texture_buffer, shader_program);
         // Set clear color to black
