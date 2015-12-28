@@ -158,18 +158,3 @@ void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLu
     }
     image->ready_to_upload = false;
 }
-
-void check_texture(GDALImage *image, GLFWwindow *window, GLuint *tex)
-{
-    // check if we're still sampling
-    /*
-     *int i;
-     *for(i = 0; i < image->band_count; i++)
-     *{
-     *    if(image->is_sampling[i])
-     *        return;
-     *}
-     */
-    // no sampling, time to read it again
-}
-

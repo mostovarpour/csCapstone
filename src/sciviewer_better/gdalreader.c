@@ -32,6 +32,7 @@ void fill_image_data(GDALImage *image)
     for(i = 0; i < image->band_count; i++)
     {
         image->is_sampling[i] = false;
+        image->bands[i] = NULL;
     }
     // Print information about the file
     puts("--------------------------------------------------------------------");
@@ -74,7 +75,9 @@ void downsample(GDALImage *image, int width, int height)
         for(i = 0; i < image->band_count; i++)
         {
             // allocate space for band info
-            image->bands[i] = (GByte *) CPLMalloc(sizeof(GByte) * width * height);
+            // if space hasn't already been allocated
+            if(image->bands[i] == NULL)
+                image->bands[i] = (GByte *) CPLMalloc(sizeof(GByte) * width * height);
             // get space for the thread params, can't just
             // get memory from the stack since as soon as
             // this function ends the stack memory will be freed
