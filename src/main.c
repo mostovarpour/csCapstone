@@ -12,17 +12,19 @@
 #include "args.h"
 GLFWwindow *window;
 Mutex resource_mutex;
-int screen_width, screen_height;
+int screen_width = 0, screen_height = 0;
+char *file_path = NULL;
 int main(int argc, char** argv)
 {
-    check_parameters(argc, argv);
+    // check parameters and update variables accordingly
+    args_check(argc, argv);
     // initialize openGL
-    init_glfw(&window); 
+    init_glfw(&window, screen_width, screen_height); 
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
     // Declare some openGL variables
-    GDALImage *image = create_gdal_image(argv[1]);
+    GDALImage *image = create_gdal_image(file_path);
     GLuint vertex_attribute_obj, element_buffer, vertex_buffer, v_shader, f_shader, shader_program
         , *texture_buffer = (GLuint*)malloc(sizeof(GLuint) * image->band_count);
     // Setup shaders
