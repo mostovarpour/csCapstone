@@ -18,15 +18,16 @@ int main(int argc, char** argv)
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
+    // Declare variables to store window size
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    GDALImage *image = create_gdal_image(argv[1], width, height);
     // Declare some openGL variables
-    GDALImage *image = create_gdal_image(argv[1]);
     GLuint vertex_attribute_obj, element_buffer, vertex_buffer, v_shader, f_shader, shader_program
         , *texture_buffer = (GLuint*)malloc(sizeof(GLuint) * image->band_count);
     // Setup shaders
     //TODO give this function a better name
     setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program);
-    // Declare variables to store window size
-    int width, height;
     // Initialize the mutex
     init_mutex(resource_mutex);
     // main loop

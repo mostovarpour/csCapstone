@@ -4,7 +4,7 @@ int limit_band_count(int count) {
     return 1;
 }
 
-void fill_image_data(GDALImage *image)
+void fill_image_data(GDALImage *image, int desired_width, int desired_height)
 {
     GDALAllRegister();
     GDALResult result;
@@ -26,6 +26,10 @@ void fill_image_data(GDALImage *image)
     GDALGetBlockSize(image->current_band, &image->block_size.x, &image->block_size.y);
     image->num_blocks.x = image->original_width/image->block_size.x;
     image->num_blocks.y = image->original_height/image->block_size.y;
+    // Calculate the output sizes for any block
+    image->output_size.x = desired_width/image->num_blocks.x; 
+    image->output_size.y = desired_height/image->num_blocks.y; 
+    printf("(%d, %d)\n", image->output_size.x, image->output_size.y);
     DEFAULT(image->num_blocks.x, 0, 1);
     DEFAULT(image->num_blocks.y, 0, 1);
     int i;
@@ -105,16 +109,101 @@ thread_func fill_band(thread_arg params)
 {
     thread_params *in = (thread_params*)params;
     lock_mutex(resource_mutex);
-    int width, height;
+    int width, height, buffer_offset, num_vals = in->image->output_size.x * in->image->output_size.y;
+    GDALResult result;
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
-    GDALResult result = GDALRasterIO(in->band, GF_Read, 
-            0, 0, width, height,
-            in->buffer, in->width, in->height, GDT_Byte, 0, 0);
-    if(result == CE_Failure)
+    
+    GByte *buffer = (GByte *) CPLMalloc(sizeof(GByte) * in->image->block_size.x * in->image->block_size.y);
+/*
+ *    result = GDALReadBlock(in->band, 0, 0, buffer);
+ *    if(result == CE_Failure)
+ *    {
+ *        fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
+ *    }
+ *    buffer_offset = 0;
+ *    unsigned int obuf = 0;
+ *    int stride = in->image->block_size.x / in->image->output_size.x;
+ *    printf("%d\n", stride);
+ *    for(int y = 0; y < in->image->output_size.y; y++)
+ *    {
+ *        for(int i = 0; i < in->image->output_size.x; i++)
+ *        {
+ *            in->buffer[buffer_offset++] = buffer[obuf];
+ *            obuf += stride; 
+ *        }
+ *        obuf+= 1800 - obuf % 1800;
+ *        buffer_offset += 800 - in->image->output_size.x;
+ *    }
+ *
+ *    result = GDALReadBlock(in->band, 1, 0, buffer);
+ *    if(result == CE_Failure)
+ *    {
+ *        fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
+ *    }
+ *    buffer_offset = in->image->output_size.x * 1 + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * 0;
+ *    obuf = 0;
+ *    printf("%d\n", stride);
+ *    for(int y = 0; y < in->image->output_size.y; y++)
+ *    {
+ *        for(int i = 0; i < in->image->output_size.x; i++)
+ *        {
+ *            in->buffer[buffer_offset++] = buffer[obuf];
+ *            obuf += stride; 
+ *        }
+ *        obuf+= 1800 - obuf % 1800;
+ *        buffer_offset += 800 - in->image->output_size.x;
+ *    }
+ */
+
+    unsigned int obuf = 0;
+    int stride = in->image->block_size.x / in->image->output_size.x;
+    for(int y_index = 0; y_index < in->image->num_blocks.y; y_index++)
     {
-        fprintf(stderr, "Failed to read band\n");
+        for(int x_index = 0; x_index < in->image->num_blocks.x; x_index++)
+        {
+            result = GDALReadBlock(in->band, x_index, y_index, buffer);
+            if(result == CE_Failure)
+            {
+                fprintf(stderr, "Failed to read block (%d, %d)\n", x_index, y_index);
+            }
+            buffer_offset = in->image->output_size.x * x_index + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * y_index;
+            obuf = 0;
+            for(int x = 0; x < in->image->output_size.y; x++)
+            {
+                for(int y = 0; y < in->image->output_size.x; y++)
+                {
+                    in->buffer[buffer_offset++] = buffer[obuf];
+                    obuf += stride;
+                }
+                obuf += 1800 - obuf % 1800;
+                buffer_offset += 800 - in->image->output_size.x;
+            }
+            // Clear the buffer (possibly not necessary...) we'll have to test with and without this
+            memset(buffer, 0, in->image->block_size.x * in->image->block_size.y * sizeof(GByte));
+        }
     }
+    /*
+     *result = GDALReadBlock(in->band, 2, 1, buffer);
+     *if(result == CE_Failure)
+     *{
+     *    fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
+     *}
+     *buffer_offset = in->image->output_size.x * 0 + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * 1;
+     *obuf = 0;
+     *for(int y = 0; y < in->image->output_size.y; y++)
+     *{
+     *    for(int i = 0; i < in->image->output_size.x; i++)
+     *    {
+     *        in->buffer[buffer_offset++] = buffer[obuf];
+     *        obuf += stride; 
+     *    }
+     *    obuf+= 1800 - obuf % 1800;
+     *    buffer_offset += 800 - in->image->output_size.x;
+     *}
+     */
+
+    CPLFree(buffer);
     // free memory allocated before threads were created 
     *in->is_sampling = false;
     if(!is_sampling(in->image))
@@ -143,13 +232,13 @@ void sample(GDALImage *image, int width, int height)
 
 // initialize is sampling and any other
 // variables that should be defaulted and return the pointer
-GDALImage *create_gdal_image(char *filepath)
+GDALImage *create_gdal_image(char *filepath, int width, int height)
 {
     GDALImage *image =(GDALImage *) malloc(sizeof(GDALImage));
     image->filepath = filepath;
     image->ready_to_upload = false;
     image->should_sample = true;
-    fill_image_data(image);
+    fill_image_data(image, width, height);
     return image;
 }
 
@@ -162,7 +251,9 @@ void destroy_gdal_image(GDALImage *image)
     // free allocated band space
     for(i = 0; i < image->band_count; i++)
     {
-        CPLFree(image->bands[i]);
+        // Don't try to free memory that hasn't been set
+        if(image->bands[i] != NULL)
+            CPLFree(image->bands[i]);
     }
     // free allocated struct
     free(image);

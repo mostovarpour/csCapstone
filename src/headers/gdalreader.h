@@ -36,6 +36,7 @@ struct GDALImageData
     double geo_transform[6]; // transform data
     Point block_size; // x and y block size
     Point num_blocks; // num of x and y blocks
+    Point output_size; // Output size for x,y of each block
     GByte *bands[3]; // pointers to band pixel data
     bool is_sampling[3]; // store which bands are currently being sampled
     bool volatile should_sample; // flag determing if the image should be resampled
@@ -85,8 +86,8 @@ int limit_band_count(int BandCount);
 void sample(GDALImage *, int width, int height);
 void print_file_information(GDALImage *);
 // Requires that the filepath of GDALImage is already set
-void fill_image_data(GDALImage *);
-GDALImage *create_gdal_image(char *filepath);
+void fill_image_data(GDALImage *, int width, int height);
+GDALImage *create_gdal_image(char *filepath, int width, int height);
 void destroy_gdal_image(GDALImage *);
 thread_func fill_band(thread_arg);
 bool is_sampling(GDALImage *);
