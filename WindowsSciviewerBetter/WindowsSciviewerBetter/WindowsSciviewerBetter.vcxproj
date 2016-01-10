@@ -39,11 +39,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\src\sciviewer_better\headers;..\..\gdal\include;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\src\headers;..\..\gdal\include;</IncludePath>
     <SourcePath>..\..\src\sciviewer_better;</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\src\sciviewer_better\headers;..\..\gdal\include;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\src\headers;..\..\gdal\include;</IncludePath>
     <SourcePath>..\..\src\sciviewer_better;</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -75,19 +75,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\sciviewer_better\gdalreader.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\glhelper.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\main.c" />
-    <ClCompile Include="..\..\src\sciviewer_better\raster.c" />
+    <ClCompile Include="..\..\src\args.c" />
+    <ClCompile Include="..\..\src\gdalreader.c" />
+    <ClCompile Include="..\..\src\glhelper.c" />
+    <ClCompile Include="..\..\src\main.c" />
+    <ClCompile Include="..\..\src\raster.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\sciviewer_better\headers\err.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\errcheck.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\gdalreader.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\glhelper.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\os.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\raster.h" />
-    <ClInclude Include="..\..\src\sciviewer_better\headers\threads.h" />
+    <ClInclude Include="..\..\src\headers\err.h" />
+    <ClInclude Include="..\..\src\headers\errcheck.h" />
+    <ClInclude Include="..\..\src\headers\gdalreader.h" />
+    <ClInclude Include="..\..\src\headers\glhelper.h" />
+    <ClInclude Include="..\..\src\headers\os.h" />
+    <ClInclude Include="..\..\src\headers\raster.h" />
+    <ClInclude Include="..\..\src\headers\threads.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
