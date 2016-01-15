@@ -119,8 +119,10 @@ void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLu
     glfwGetWindowSize(window, &width, &height);
     sample(image, width, height);
     // if the image isn't ready then there's no point
-    if(!image->ready_to_upload)
-        return;
+    
+    //Commenting these out so we can see progress as we go
+    //if(!image->ready_to_upload)
+    //    return;
     /*******************
      *TEXTURE STUFF YAY*
      *******************/
