@@ -17,3 +17,6 @@ clean:
 	
 compile:
 	$(foreach file, $(FILES), gcc -c -std=c99 -Iheaders $(file).c -o $(OBJDIR)/$(file).o;)
+
+#osx:
+#	$(foreach file, $(files), gcc -c -std=c99 -Iheaders $(file).c -o $(OBJDIR)/$(file).o) -framework OpenGL -framework GLUT
