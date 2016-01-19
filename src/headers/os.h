@@ -9,15 +9,11 @@ typedef unsigned char bool;
 #define false 0
 #define true 1
 
-//These two ifdefs are for compiling on OSX
-#ifdef __APPLE__
+//This is for compiling on OSX
+#ifdef (__APPLE__)
 #include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
 #include <GL/gl.h>
-#endif
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
+#include <GL/glu.h>
 #endif
