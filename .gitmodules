@@ -1,9 +1,0 @@
-[submodule "bgfx/bx"]
-	path = bgfx/bx
-	url = https://github.com/razanix/bx.git
-[submodule "bgfx/bgfx"]
-	path = bgfx/bgfx
-	url = https://github.com/razanix/bgfx.git
-[submodule "gdal"]
-	path = gdal
-	url = https://github.com/dangarbri/gdal.git
