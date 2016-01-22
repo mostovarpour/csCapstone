@@ -16,4 +16,4 @@ clean:
 	rm -rf build
 	
 compile:
-	$(foreach file, $(FILES), gcc -c -Iheaders $(file).c -o $(OBJDIR)/$(file).o;)
+	$(foreach file, $(FILES), gcc -std=c99 -c -Iheaders $(file).c -o $(OBJDIR)/$(file).o;)

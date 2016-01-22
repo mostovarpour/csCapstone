@@ -1,6 +1,6 @@
-/*char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";*/
+char* filepath = "/media/matthew/raid5Array/capstone/lunarPic.cub";
 //char* filepath = "/media/matthew/raid5Array/capstone/mars.tif";
-char* filepath = "/home/leah/Pictures/mars.tif";
+//char* filepath = "/home/leah/Pictures/mars.tif";
 extern int scale;
 int currentlySampling          = 0;
 int resampled                  = 0;
