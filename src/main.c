@@ -21,8 +21,9 @@ int main(int argc, char** argv)
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
+    glfwGetWindowSize(window, &screen_width, &screen_height);
+    GDALImage *image = create_gdal_image(file_path, screen_width, screen_height);
     // Declare some openGL variables
-    GDALImage *image = create_gdal_image(file_path);
     GLuint vertex_attribute_obj, element_buffer, vertex_buffer, v_shader, f_shader, shader_program
         , *texture_buffer = (GLuint*)malloc(sizeof(GLuint) * image->band_count);
     // Setup shaders
