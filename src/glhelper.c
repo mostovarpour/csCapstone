@@ -4,7 +4,7 @@ void error_callback(int error, const char* description) {
     printf("Error %d: %s\n", error, description);
 }
 
-void init_glfw(ptGLFWwindow window)
+void init_glfw(ptGLFWwindow window, int width, int height)
 {
     // set error callback
     glfwSetErrorCallback(error_callback);
@@ -16,8 +16,14 @@ void init_glfw(ptGLFWwindow window)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
+    // check supplied width and height
+    if(width < ARGS_MINIMUM_WIDTH)
+        width = 800;
+    if(height < ARGS_MINIMUM_HEIGHT)
+        height = 600;
+    // TODO get flag for maintain aspect ratio
     // get screen size
-    *window = glfwCreateWindow(800, 600, "Gigapixel Viewer", NULL, NULL);
+    *window = glfwCreateWindow(width, height, "Gigapixel Viewer", NULL, NULL);
     if(!*window) 
     {
         glfwTerminate();

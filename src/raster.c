@@ -19,9 +19,9 @@ const char *fragment_shader =
 "out vec4 outColor;" // output a vec4 (r,g,b,a)
 "void main()"
 "{"
-"   vec4 tmpr = texture2D(tex[0], TexCoord);"
-"   vec4 tmpg = texture2D(tex[1], TexCoord);"
-"   vec4 tmpb = texture2D(tex[2], TexCoord);"
+"   vec4 tmpr = texture(tex[0], TexCoord);"
+"   vec4 tmpg = texture(tex[1], TexCoord);"
+"   vec4 tmpb = texture(tex[2], TexCoord);"
 "   outColor = vec4(tmpr.r, tmpg.r, tmpb.r, 1.0f);"
 "}"
 ;
