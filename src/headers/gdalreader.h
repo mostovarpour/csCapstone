@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-#include <GL/gl.h>
 #include <GDAL/gdal.h>
 #include <GDAL/cpl_conv.h> /* for CPLMalloc() */
 #include "errcheck.h"

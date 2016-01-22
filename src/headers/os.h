@@ -1,3 +1,6 @@
+#ifndef __OS__
+#define __OS__
+
 // Include windows for CreateThread or pthread for linux threads depending on build platform
 #if defined _WIN32 || _WIN64
     #include <Windows.h>
@@ -10,10 +13,13 @@ typedef unsigned char bool;
 #define true 1
 
 //This is for compiling on OSX
-#ifdef __APPLE
+#ifdef __APPLE__
+#include <GL/glew.h>
 #include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+//#include <OpenGL/glu.h>
 #else
+#include <GL/glew.h>
 #include <GL/gl.h>
-#include <GL/glu.h>
+//#include <GL/glu.h>
+#endif
 #endif
