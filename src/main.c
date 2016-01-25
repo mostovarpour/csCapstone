@@ -28,7 +28,7 @@ int main(int argc, char** argv)
         , *texture_buffer = (GLuint*)malloc(sizeof(GLuint) * image->band_count);
     // Setup shaders
     //TODO give this function a better name
-    setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program);
+    setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program, screen_height);
     // Initialize the mutex
     init_mutex(resource_mutex);
     // main loop

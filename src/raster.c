@@ -27,18 +27,21 @@ const char *fragment_shader =
 ;
 
 // pass in pointers so we can free the memory in the gpu later
-void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint *vertex_buffer, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program) 
+void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint *vertex_buffer, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program, int height) 
 {
     glewInit();
+    // calculate OpenGL point for 50px away from the top
+    float top = ((height / 2.0f - 50) / (height / 2.0f));
     // create vertices simple triangle
     float vertices[] = {
         //position     //texture coordinates
-        -1.0f,  1.0f,  0.0f, 0.0f, // top left 
-         1.0f,  1.0f,  1.0f, 0.0f, // top right
+        -1.0f,  top ,  0.0f, 0.0f, // top left 
+         1.0f,  top ,  1.0f, 0.0f, // top right
          1.0f, -1.0f,  1.0f, 1.0f, // bottom-right
         -1.0f, -1.0f,  0.0f, 1.0f  // bottom-left
     };
-
+    glDeleteBuffers(1, vertex_attribute_obj);
+    glDeleteBuffers(1, vertex_buffer);
     // create vertex array object for storing shader and attribute data
     glGenVertexArrays(1, vertex_attribute_obj);
     glBindVertexArray(*vertex_attribute_obj);
