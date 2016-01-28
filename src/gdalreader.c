@@ -109,52 +109,12 @@ thread_func fill_band(thread_arg params)
 {
     thread_params *in = (thread_params*)params;
     lock_mutex(resource_mutex);
-    int width, height, buffer_offset, num_vals = in->image->output_size.x * in->image->output_size.y;
+    int width, height, buffer_offset;
     GDALResult result;
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
-    
+    // allocate space for the block
     GByte *buffer = (GByte *) CPLMalloc(sizeof(GByte) * in->image->block_size.x * in->image->block_size.y);
-/*
- *    result = GDALReadBlock(in->band, 0, 0, buffer);
- *    if(result == CE_Failure)
- *    {
- *        fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
- *    }
- *    buffer_offset = 0;
- *    unsigned int obuf = 0;
- *    int stride = in->image->block_size.x / in->image->output_size.x;
- *    printf("%d\n", stride);
- *    for(int y = 0; y < in->image->output_size.y; y++)
- *    {
- *        for(int i = 0; i < in->image->output_size.x; i++)
- *        {
- *            in->buffer[buffer_offset++] = buffer[obuf];
- *            obuf += stride; 
- *        }
- *        obuf+= 1800 - obuf % 1800;
- *        buffer_offset += 800 - in->image->output_size.x;
- *    }
- *
- *    result = GDALReadBlock(in->band, 1, 0, buffer);
- *    if(result == CE_Failure)
- *    {
- *        fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
- *    }
- *    buffer_offset = in->image->output_size.x * 1 + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * 0;
- *    obuf = 0;
- *    printf("%d\n", stride);
- *    for(int y = 0; y < in->image->output_size.y; y++)
- *    {
- *        for(int i = 0; i < in->image->output_size.x; i++)
- *        {
- *            in->buffer[buffer_offset++] = buffer[obuf];
- *            obuf += stride; 
- *        }
- *        obuf+= 1800 - obuf % 1800;
- *        buffer_offset += 800 - in->image->output_size.x;
- *    }
- */
 
     unsigned int obuf = 0;
     int stride = in->image->block_size.x / in->image->output_size.x;
@@ -167,41 +127,27 @@ thread_func fill_band(thread_arg params)
             {
                 fprintf(stderr, "Failed to read block (%d, %d)\n", x_index, y_index);
             }
+            // gets the location where the first pixel of the block should go
             buffer_offset = in->image->output_size.x * x_index + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * y_index;
             obuf = 0;
-            for(int x = 0; x < in->image->output_size.y; x++)
+            for(int i = 0; i < in->image->output_size.y; i++)
             {
-                for(int y = 0; y < in->image->output_size.x; y++)
+                for(int j = 0; j < in->image->output_size.x; j++)
                 {
+                    // in->buffer is the band buffer that gets rendered/screen buffer, buffer
                     in->buffer[buffer_offset++] = buffer[obuf];
+                    // jump to next pixel
                     obuf += stride;
                 }
+                // skip to the end of the current line of the block
                 obuf += 1800 - obuf % 1800;
+                // skip to the next line in the screen buffer
                 buffer_offset += 800 - in->image->output_size.x;
             }
             // Clear the buffer (possibly not necessary...) we'll have to test with and without this
             memset(buffer, 0, in->image->block_size.x * in->image->block_size.y * sizeof(GByte));
         }
     }
-    /*
-     *result = GDALReadBlock(in->band, 2, 1, buffer);
-     *if(result == CE_Failure)
-     *{
-     *    fprintf(stderr, "Failed to read block (%d, %d)\n", 0, 0);
-     *}
-     *buffer_offset = in->image->output_size.x * 0 + in->image->output_size.x * in->image->num_blocks.x * in->image->output_size.y * 1;
-     *obuf = 0;
-     *for(int y = 0; y < in->image->output_size.y; y++)
-     *{
-     *    for(int i = 0; i < in->image->output_size.x; i++)
-     *    {
-     *        in->buffer[buffer_offset++] = buffer[obuf];
-     *        obuf += stride; 
-     *    }
-     *    obuf+= 1800 - obuf % 1800;
-     *    buffer_offset += 800 - in->image->output_size.x;
-     *}
-     */
 
     CPLFree(buffer);
     // free memory allocated before threads were created 
