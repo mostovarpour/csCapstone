@@ -1,0 +1,8 @@
+WINDOWS IS SHIT
+    one really cool library - ANGL, they use it to use webGL inside of chrome. THe problem with ANGL is that it is not just openGL it is GLES2.
+    When we compile GLFW we need to compile it against ANGL not the native openGL library.
+    Check out using BGFX as a replacement for GLFW
+
+
+Peer Review
+    Every 2 weeks we send Dr. Palmer an email before the meeting rating each member of our teams progress. Each team member is worth 100 points and you must use all 400 points
