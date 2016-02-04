@@ -17,9 +17,6 @@ FILES=glhelper main gdalreader raster args
 all: clean setup compile
 	gcc $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
 
-#osx:
-	#$(foreach file, $(files), gcc -c -std=c99 -Iheaders -framework OpenGL -framework GLUT $(file).c -o $(OBJDIR)/$(file).o) 
-
 setup:
 	mkdir -p $(BINDIR)
 	mkdir -p $(OBJDIR)
