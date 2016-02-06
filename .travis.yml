@@ -1,4 +1,8 @@
 language: c
+os:
+    - linux
+    - osx
+
 matrix:
     include:
         - compiler: gcc
@@ -7,12 +11,18 @@ matrix:
             os: osx
 
 before_install:
+    #installing dependencies for osx
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select –install; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ruby -e “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
+	#installing dependencies for linux
+	- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install lib
+    #need to finish up these
 
 script:
-    make
+    - cd src
 
 branches:
     only:
         -master
-
-osx_image: xcode7.3
