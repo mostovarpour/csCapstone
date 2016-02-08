@@ -8,14 +8,14 @@ ifeq ($(OS), Darwin)
 	LIBS=glfw3 gdal GLEW pthread 
 	MACLINK= -framework OpenGL
 else
-	LIBS=glfw3 gdal GLEW GLU GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama
+	LIBS=GL X11 pthread
 endif
-LINK=$(foreach lib, $(LIBS), -l$(lib))
+LINK=-L../bgfx/.build/linux64_gcc/bin -lbgfxRelease -lexample-commonRelease $(foreach lib, $(LIBS), -l$(lib))
 
-FILES=glhelper main gdalreader raster args
+FILES=main.cpp
 
 all: clean setup compile
-	gcc $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
+	g++ $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
 
 setup:
 	mkdir -p $(BINDIR)
@@ -25,4 +25,4 @@ clean:
 	rm -rf build
 	
 compile:
-	$(foreach file, $(FILES), gcc -c -std=c99 -Iheaders $(file).c -o $(OBJDIR)/$(file).o;)
+	$(foreach file, $(FILES), g++ -c -std=c++11 -Iheaders -I../bgfx/include -I../bx/include -I../bgfx/examples/common $(file) -o $(OBJDIR)/$(file).o;)
