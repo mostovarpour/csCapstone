@@ -19,10 +19,11 @@ before_install:
 	#installing dependencies for linux
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libglew-dev
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libglfw-dev
-    #need to finish up these
 
 script:
     - cd src
+    - make
+    - ./build/bin/main 
 
 branches:
     only:
