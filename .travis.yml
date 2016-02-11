@@ -17,7 +17,8 @@ before_install:
 	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
 	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
 	#installing dependencies for linux
-	- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install lib
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libglew-dev
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libglfw-dev
     #need to finish up these
 
 script:
