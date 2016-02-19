@@ -1,4 +1,8 @@
 # Daniel checking if he can make it work by following gdal's .travis.yml
+
+os:
+    - linux
+
 language: c++ # c++ for easy command line parser
 
 compiler:
