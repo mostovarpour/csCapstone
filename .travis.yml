@@ -1,30 +1,59 @@
-language: c
-os:
-    - linux
-    - osx
+# Daniel checking if he can make it work by following gdal's .travis.yml
+language: c++ # c++ for easy command line parser
 
-matrix:
-    include:
-        - compiler: gcc
-            os: linux
-        - compiler: clang
-            os: osx
+#os:
+    #- linux
+    #- osx
+
+#matrix:
+    #include:
+        #- compiler: gcc
+            #os: linux
+        #- compiler: clang
+            #os: osx
+            #
+compiler:
+    - g++ #update this to clang at some point
 
 before_install:
-    #installing dependencies for osx
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select –install; fi
-	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ruby -e “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”; fi
-	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
-	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
+    ##installing dependencies for osx
+    #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select –install; fi
+	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ruby -e “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”; fi
+	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
+	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
 	
-	#installing dependencies for linux
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libglew-dev libglfw-dev
+	##installing dependencies for linux
+    #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq
+    #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libglew-dev libglfw-dev
+    # get mesa x11 stuff for glfw3
+    - sudo apt-get update
+    - sudo apt-get install xorg-dev libgl1-mesa-dev
+    # Build glfw3
+    - wget https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.zip
+    - unzip glfw-3.1.2.zip
+    - cd glfw-3.1.2
+    - cmake .
+    - make
+    - sudo make install
+    - cd ..
+    # get glew
+    - sudo apt-get install libglew-dev
+    # get gdal
+    - wget http://download.osgeo.org/gdal/2.0.2/gdal-2.0.2.tar.gz
+    - tar zxvf gdal-2.0.2.tar.gz
+    - cd gdal-2.0.2
+    - ./configure && make && sudo make install
+    - cd ..
 
-script:
+install:
     - cd src
     - make
-    - ./build/bin/main 
+    - cd build/bin
+
+#script:
+    #- cd src
+    #- make
+    #- ./build/bin/main 
 
 after_success:
     - echo("Build finished succesfully!");
