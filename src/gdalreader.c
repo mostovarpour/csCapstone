@@ -69,8 +69,8 @@ void downsample(GDALImage *image, int width, int height)
         int i;
         // prepare threads
         // can't have image->band_count inside [] to declare array
-        thread_params **thread_parameters = malloc(sizeof(thread_params *) * image->band_count); 
-        thread *threads = malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
+        thread_params **thread_parameters = (thread_params **) malloc(sizeof(thread_params *) * image->band_count); 
+        thread *threads = (thread*) malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
         // set up thread parameters
         for(i = 0; i < image->band_count; i++)
         {

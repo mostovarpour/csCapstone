@@ -24,10 +24,11 @@ before_install:
     - ./configure --includedir=/usr/local/include/GDAL && make && sudo make install
     - cd ..
 
-install:
+install: true
+
+script:
     - cd src
     - make
-    - cd build/bin
 
 after_success:
     - echo("Build finished succesfully!");
