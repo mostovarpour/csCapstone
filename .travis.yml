@@ -1,4 +1,8 @@
 # Daniel checking if he can make it work by following gdal's .travis.yml
+CI=true
+TRAVIS=true
+CONTINUOUS_INTEGRATION=true
+DEBIAN_FRONTEND=noninteractive
 
 os:
     - linux
