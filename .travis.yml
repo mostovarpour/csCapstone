@@ -21,7 +21,7 @@ before_install:
     - wget http://download.osgeo.org/gdal/2.0.2/gdal-2.0.2.tar.gz
     - tar zxvf gdal-2.0.2.tar.gz
     - cd gdal-2.0.2
-    - ./configure && make && sudo make install
+    - ./configure --includedir=/usr/local/include/GDAL && make && sudo make install
     - cd ..
 
 install:
