@@ -69,8 +69,8 @@ void downsample(GDALImage *image, int width, int height)
         int i;
         // prepare threads
         // can't have image->band_count inside [] to declare array
-        thread_params **thread_parameters = malloc(sizeof(thread_params *) * image->band_count); 
-        thread *threads = malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
+        thread_params **thread_parameters = (thread_params **) malloc(sizeof(thread_params *) * image->band_count); 
+        thread *threads = (thread*) malloc(sizeof(thread) * image->band_count); // create the threads just so that the create_thread function is happy, then fire and forget
         // set up thread parameters
         for(i = 0; i < image->band_count; i++)
         {
@@ -108,9 +108,17 @@ thread_func fill_band(thread_arg params)
     int width, height;
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
+    GDALRasterIOExtraArg pArg;
+    pArg.nVersion = 1;
+    pArg.eResampleAlg = GRIORA_Stochastic;
+    /*
+     *GDALResult result = GDALRasterIOEx(in->band, GF_Read, 
+     *        0, 0, width, height,
+     *        in->buffer, 1200, 1800, GDT_Byte, 0, 0, &pArg);
+     */
     GDALResult result = GDALRasterIO(in->band, GF_Read, 
             0, 0, width, height,
-            in->buffer, in->width, in->height, GDT_Byte, 0, 0);
+            in->buffer, 1200, 1800, GDT_Byte, 0, 0);
     if(result == CE_Failure)
     {
         fprintf(stderr, "Failed to read band\n");
