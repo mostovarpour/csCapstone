@@ -2,8 +2,6 @@
 language: c++ # c++ for easy command line parser
 
 compiler:
-    - gcc
-    - clang
     - g++ #update this to clang at some point
 
 before_install:
@@ -25,6 +23,8 @@ before_install:
     - cd gdal-2.0.2
     - ./configure --includedir=/usr/local/include/GDAL && make && sudo make install
     - cd ..
+
+install: true
 
 script:
     - cd src
