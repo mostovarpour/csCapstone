@@ -108,9 +108,20 @@ thread_func fill_band(thread_arg params)
     int width, height;
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
-    GDALResult result = GDALRasterIO(in->band, GF_Read, 
+    GDALRasterIOExtraArg args;
+    args.nVersion = RASTERIO_EXTRA_ARG_CURRENT_VERSION;
+    args.eResampleAlg = GRIORA_Stochastic;
+    args.bFloatingPointWindowValidity = FALSE;
+    args.pfnProgress = NULL;
+    args.pProgressData = NULL;
+    /*
+     *GDALResult result = GDALRasterIO(in->band, GF_Read, 
+     *        0, 0, width, height,
+     *        in->buffer, in->width, in->height, GDT_Byte, 0, 0);
+     */
+    GDALResult result = GDALRasterIOEx(in->band, GF_Read, 
             0, 0, width, height,
-            in->buffer, in->width, in->height, GDT_Byte, 0, 0);
+            in->buffer, in->width, in->height, GDT_Byte, 0, 0, &args);
     if(result == CE_Failure)
     {
         fprintf(stderr, "Failed to read band\n");
