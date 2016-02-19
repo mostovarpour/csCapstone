@@ -1,31 +1,10 @@
 # Daniel checking if he can make it work by following gdal's .travis.yml
 language: c++ # c++ for easy command line parser
 
-#os:
-    #- linux
-    #- osx
-
-#matrix:
-    #include:
-        #- compiler: gcc
-            #os: linux
-        #- compiler: clang
-            #os: osx
-            #
 compiler:
     - g++ #update this to clang at some point
 
 before_install:
-    ##installing dependencies for osx
-    #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select –install; fi
-	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ruby -e “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”; fi
-	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
-	#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
-	
-	##installing dependencies for linux
-    #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq
-    #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libglew-dev libglfw-dev
-    # get mesa x11 stuff for glfw3
     - sudo apt-get update
     - sudo apt-get install xorg-dev libgl1-mesa-dev
     # Build glfw3
@@ -49,11 +28,6 @@ install:
     - cd src
     - make
     - cd build/bin
-
-#script:
-    #- cd src
-    #- make
-    #- ./build/bin/main 
 
 after_success:
     - echo("Build finished succesfully!");
