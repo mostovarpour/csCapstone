@@ -44,6 +44,6 @@ after_success:
 after_failure:
     - echo("Something went horribly wrong.");
 
-branches:
-    only:
-        -master
+# branches:
+#   only:
+#       -master
