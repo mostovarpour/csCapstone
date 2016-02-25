@@ -1,5 +1,5 @@
-CI=true
-TRAVIS=true
+#CI=true
+#TRAVIS=true
 #CONTINUOUS_INTEGRATION=true
 #DEBIAN_FRONTEND=noninteractive
 
