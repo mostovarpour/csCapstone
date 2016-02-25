@@ -1,0 +1,17 @@
+Technology stack - usually more general than an architecture
+    have the different hardwares and softwares and write about how they relate to eachother
+    
+Instead of having actualy code in the docs have UMl that represents an actual a higher abstraction than the code
+    Don't be too detailed for a requirement document
+    Refer to the points more abstractly such as "Hey there is a thing that does this."
+
+Check out API documentation
+
+Input handler
+    Even though it is not an OO language, you could just use a UML box there and people would know what you are talking about
+
+For the implementation plan, bulleted list or not bulleted list?
+    Dr. Palmer said that it should be an expanded non-bulleted list. Keep the figure and then refer to the figure
+
+Need a conclusion of some sort, should be a different section
+    Should recap what we have gone over in the proposal

@@ -1,0 +1,37 @@
+language: c
+os:
+    - linux
+    - osx
+
+matrix:
+    include:
+        - compiler: gcc
+            os: linux
+        - compiler: clang
+            os: osx
+
+before_install:
+    #installing dependencies for osx
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select –install; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ruby -e “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew doctor; fi
+	- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask; fi
+	
+	#installing dependencies for linux
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq libglew-dev libglfw-dev
+
+script:
+    - cd src
+    - make
+    - ./build/bin/main 
+
+after_success:
+    - echo("Build finished succesfully!");
+
+after_failure:
+    - echo("Something went horribly wrong.");
+
+branches:
+    only:
+        -master

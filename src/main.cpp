@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     // check parameters and update variables accordingly
    // args_check(argc, argv);
     // initialize openGL
-    init_glfw(&window, screen_width, screen_height); 
+    init_glfw(&window, screen_width, screen_height);
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
