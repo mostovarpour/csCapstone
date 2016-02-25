@@ -1,21 +1,22 @@
 #include "os.h"
 #include <GLFW/glfw3.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
+#include <ctime>
 #include "glhelper.h"
 #include "gdalreader.h"
 #include "raster.h"
 #include "args.h"
 GLFWwindow *window;
 Mutex resource_mutex;
-int screen_width = 0, screen_height = 0;
+int screen_width = 0, screen_height = 0, sampling_rate;
+//boolean verbose_mode;
 char *file_path = NULL;
 int main(int argc, char** argv)
 {
     // check parameters and update variables accordingly
-    args_check(argc, argv);
+   // args_check(argc, argv);
     // initialize openGL
     init_glfw(&window, screen_width, screen_height); 
     // setup glew for most recent openGL functions

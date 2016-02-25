@@ -4,13 +4,14 @@
 // Include windows for CreateThread or pthread for linux threads depending on build platform
 #if defined _WIN32 || _WIN64
     #include <Windows.h>
+	//typedef unsigned char bool;
+
 #else
     #include <pthread.h>
 #endif
 // boolean type
-typedef unsigned char bool;
-#define false 0
-#define true 1
+//#define false 0
+//#define true 1
 
 //This is for compiling on OSX
 #ifdef __APPLE__
