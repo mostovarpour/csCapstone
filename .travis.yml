@@ -1,11 +1,11 @@
-# Daniel checking if he can make it work by following gdal's .travis.yml
 CI=true
 TRAVIS=true
-CONTINUOUS_INTEGRATION=true
-DEBIAN_FRONTEND=noninteractive
+#CONTINUOUS_INTEGRATION=true
+#DEBIAN_FRONTEND=noninteractive
 
 os:
     - linux
+    - osx
 
 language: c++ # c++ for easy command line parser
 
