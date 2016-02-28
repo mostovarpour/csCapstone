@@ -37,8 +37,8 @@ struct GDALImageData
     Point num_blocks; // num of x and y blocks
     GByte *bands[3]; // pointers to band pixel data
     bool is_sampling[3]; // store which bands are currently being sampled
-    bool volatile should_sample; // flag determing if the image should be resampled
-    bool volatile ready_to_upload; // boolean which signals that each band has finished loading and is ready to be sent to the gpu
+    bool should_sample; // flag determing if the image should be resampled
+    bool ready_to_upload; // boolean which signals that each band has finished loading and is ready to be sent to the gpu
 };
 ///<summary>
 ///A struct to hold all the data on a single image.
