@@ -3,72 +3,10 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-//#include "common.h"
-#include "bgfx_utils.H"
-
+#include "common.h"
 #include <bgfx/bgfx.h>
-#include <bx/*>
-
-class cubImage : public entry::AppI
-{
-    void init(int _argc, _argv);
-    {
-        Args args(_argc, _argv);
-
-        m_width     = _argc;
-        m_height    = _argv;
-        m_debug     = BGFX_DEBUG_TEXT;
-        m_reset     = BGFX_RESET_VSYNC;
-
-        bgfx::init(args.m_type, args.m_pcId);
-        bgfx::reset(m_width, m_height, m_reset);
-
-        //enable debug text
-        bgfx::setDebug(m_debug);
-
-        //set view 0 clear state
-        bgfx::setViewClear(0
-                ,   BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-                ,   0x303030ff
-                ,   1.0f
-                ,   0
-                );
-
-        //get renderer capabilities info
-        const bgfx::Caps* caps = bgfx::getCaps();
-        m_instancingSupported = 0 != (caps->supported & BGFX_CAPS_INSTANCING);
-    }
-
-    //creating a 2d texture
-    bgfx::createTexture2d(m_width, m_height);
-
-    virtual int shutdown() BX_OVERRIDE
-    {
-        //cleaning up
-        //cleanup vars here
-        
-        //shutting down bgfx
-        bgfx::shutdown();
-        return 0;
-    }
-
-    bgfx::VertexBufferHandle    m_vbh; 
-    bgfx::IndexBufferHandle     m_ibh;
-    bgfx::UniformHandle         s_texColor;
-    bgfx::UniformHandle         s_texNormal;
-    bgfx::UniformHandle         u_lightPosRadius;
-    bgfx::UniformHandle         u_lightRgbInnerR;
-    bgfx::ProgramHandle         m_program;
-    bgfx::TextureHandle         m_textureColor;
-    bgfx::TextureHandle         m_textureNormal;
-    uint16_t                    m_numLights;
-    bool                        m_instancingSupported;
-    uint32_t                    m_width;
-    uint32_t                    m_height;
-    uint32_t                    m_debug;
-    uint32_t                    m_reset;
-    int64_t                     m_timeOffset;
-};
+#include <bx/uint32_t.h>
+//#include "logo.h"
 
 int _main_(int /*_argc*/, char** /*_argv*/)
 {
@@ -77,11 +15,11 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init(BGFX_PCI_ID_NONE);
+	bgfx::init();
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.
-	//bgfx::setDebug(debug);
+	bgfx::setDebug(debug);
 
 	// Set view 0 clear state.
 	bgfx::setViewClear(0
@@ -100,11 +38,26 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		// if no other draw calls are submitted to view 0.
 		bgfx::touch(0);
 
+		// Use debug font to print information about this example.
+		bgfx::dbgTextClear();
+
+        //We don't need this since it is just that bgfx logo
+        /*
+		 *bgfx::dbgTextImage(bx::uint16_max(width/2/8, 20)-20
+		 *                 , bx::uint16_max(height/2/16, 6)-6
+		 *                 , 40
+		 *                 , 12
+		 *                 , s_logo
+		 *                 , 160
+		 *                 );
+         */
+
+		bgfx::dbgTextPrintf(0, 1, 0x4f, "capstone test");
+		bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Initialization and debug text.");
+
 		// Advance to next frame. Rendering thread will be kicked to
 		// process submitted rendering primitives.
 		bgfx::frame();
-
-		
 	}
 
 	// Shutdown bgfx.

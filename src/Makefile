@@ -10,7 +10,8 @@ ifeq ($(OS), Darwin)
 else
 	LIBS=GL X11 pthread
 endif
-LINK=-L../bgfx/.build/linux64_gcc/bin -lbgfxRelease -lexample-commonRelease $(foreach lib, $(LIBS), -l$(lib))
+
+LINK=-L/home/matthew/software/bgfx/.build/linux64_gcc/bin -lbgfxRelease -lexample-commonRelease $(foreach lib, $(LIBS), -l$(lib))
 
 FILES=main.cpp
 
@@ -25,4 +26,4 @@ clean:
 	rm -rf build
 	
 compile:
-	$(foreach file, $(FILES), g++ -c -std=c++11 -Iheaders -I../bgfx/include -I../bx/include -I../bgfx/examples/common $(file) -o $(OBJDIR)/$(file).o;)
+	$(foreach file, $(FILES), g++ -c -std=c++11 -Iheaders -I/home/matthew/software/bgfx/include -I/home/matthew/software/bx/include -I/home/matthew/software/bgfx/examples/common -I/home/matthew/software/bgfx/examples/00-helloworld $(file) -o $(OBJDIR)/$(file).o;)
