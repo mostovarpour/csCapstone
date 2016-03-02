@@ -37,22 +37,6 @@ static const uint16_t indices[6] =
 
 class Renderer : public entry::AppI
 {
-    bgfx::VertexBufferHandle m_vbh;
-    bgfx::IndexBufferHandle  m_ibh;
-    bgfx::UniformHandle s_texColor;
-    bgfx::UniformHandle s_texNormal;
-    bgfx::UniformHandle u_lightPosRadius;
-    bgfx::UniformHandle u_lightRgbInnerR;
-    bgfx::ProgramHandle m_program;
-    bgfx::TextureHandle m_textureColor;
-    bgfx::TextureHandle m_textureNormal;
-    uint16_t m_numLights;
-    bool m_instancingSupported;
-
-    uint32_t m_width;
-    uint32_t m_height;
-    uint32_t m_debug;
-    uint32_t m_reset;
 
     /*
      * Load gdal image
@@ -90,7 +74,7 @@ class Renderer : public entry::AppI
         bgfx::init(args.m_type, args.m_pciId);
         bgfx::reset(m_width, m_height, m_reset);
 
-        bgfx::setDebug(m_debug);
+        //bgfx::setDebug(m_debug);
 
         // Set view 0 clear state.
         bgfx::setViewClear(0
@@ -120,6 +104,7 @@ class Renderer : public entry::AppI
         m_program = loadProgram("vertex_shader", "frag_shader");
 
         m_textureColor = loadImage("/home/leah/Pictures/colorhillshade_mola128_mola64_merge_90Nto90S_Simp_clon0.tif");
+        puts("init complete");
     }
 
     virtual int shutdown() BX_OVERRIDE
@@ -156,4 +141,19 @@ class Renderer : public entry::AppI
         bgfx::frame();
         return true;
     }
+
+    bgfx::VertexBufferHandle m_vbh;
+    bgfx::IndexBufferHandle  m_ibh;
+    bgfx::UniformHandle s_texColor;
+    bgfx::ProgramHandle m_program;
+    bgfx::TextureHandle m_textureColor;
+    uint16_t m_numLights;
+    bool m_instancingSupported;
+
+    uint32_t m_width;
+    uint32_t m_height;
+    uint32_t m_debug;
+    uint32_t m_reset;
+
 };
+ENTRY_IMPLEMENT_MAIN(Renderer);

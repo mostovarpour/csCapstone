@@ -11,9 +11,9 @@ else
 	LIBS=GL X11 pthread
 endif
 
-LINK=-L../bgfx/.build/linux64_gcc/bin -lbgfxRelease -lexample-commonRelease $(foreach lib, $(LIBS), -l$(lib))
+LINK=-L../bgfx/.build/linux64_gcc/bin -lbgfxRelease -lexample-commonRelease -lgdal $(foreach lib, $(LIBS), -l$(lib))
 
-FILES=main.cpp
+FILES=helloworld.cpp
 
 all: clean setup compile
 	g++ $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
