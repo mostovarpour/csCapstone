@@ -1,0 +1,51 @@
+#CI=true
+#TRAVIS=true
+#CONTINUOUS_INTEGRATION=true
+#DEBIAN_FRONTEND=noninteractive
+
+os:
+    - linux
+    - osx
+
+language: c++ # c++ for easy command line parser
+
+compiler:
+    - gcc
+    - clang
+    - g++ #update this to clang at some point
+
+before_install:
+    - sudo apt-get update -qq
+    - sudo add-apt-repository  ppa:george-edison55/cmake-3.x
+    - sudo apt-get install -qq cmake xorg-dev libgl1-mesa-dev
+    - sudo apt-get install --only-upgrade cmake -qq
+    # Build glfw3
+    - wget https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.zip
+    - unzip glfw-3.1.2.zip
+    - cd glfw-3.1.2
+    - cmake .
+    - make
+    - sudo make install
+    - cd ..
+    # get glew
+    - sudo apt-get install libglew-dev
+    # get gdal
+    - wget http://download.osgeo.org/gdal/2.0.2/gdal-2.0.2.tar.gz
+    - tar zxvf gdal-2.0.2.tar.gz
+    - cd gdal-2.0.2
+    - ./configure --includedir=/usr/local/include/GDAL && make && sudo make install
+    - cd ..
+
+script:
+    - cd src
+    - make
+
+after_success:
+    - echo("Build finished succesfully!");
+
+after_failure:
+    - echo("Something went horribly wrong.");
+
+branches:
+    only:
+        -master
