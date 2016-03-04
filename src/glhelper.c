@@ -21,7 +21,12 @@ void init_glfw(ptGLFWwindow window, int width, int height)
         width = 800;
     if(height < ARGS_MINIMUM_HEIGHT)
         height = 600;
-    // TODO get flag for maintain aspect ratio
+    // TODO set width and height for aspect ratio here
+    // in main.c there is a function call to create_gdal_image, that creates
+    // a struct with data on the width and height of the image
+    // You may have to move things around so you can pass that data to this function
+    // which creates the window.
+    
     // get screen size
     *window = glfwCreateWindow(width, height, "Gigapixel Viewer", NULL, NULL);
     if(!*window) 
