@@ -26,7 +26,7 @@ void init_glfw(ptGLFWwindow window, int width, int height)
 	//One of the values has to be converted to a double in order to recieve a decimal value answer for the following division equation
 	double heightDouble = height;
 	//This is a standard formula for resizing an image while keeping the aspect ratio
-	setHeight = (heightDouble / width) * setWidth;
+	setHeight = ((heightDouble / width) * setWidth) + 50;
 
 	width = setWidth;
 	height = setHeight;
