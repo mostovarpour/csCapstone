@@ -25,15 +25,15 @@ void init_glfw(ptGLFWwindow window, int width, int height)
 
 	//One of the values has to be converted to a double in order to recieve a decimal value answer for the following division equation
 	double heightDouble = height;
-
-	double testing = (heightDouble / width);
-	setHeight = (testing) * setWidth;
+	setHeight = (heightDouble / width) * setWidth;
 
     // check supplied width and height
+	/*
     if(width < ARGS_MINIMUM_WIDTH)
         width = 800;
     if(height < ARGS_MINIMUM_HEIGHT)
         height = 600;
+	*/
 
 	width = setWidth;
 	height = setHeight;
