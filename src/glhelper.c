@@ -28,16 +28,8 @@ void init_glfw(ptGLFWwindow window, int width, int height)
 	//This is a standard formula for resizing an image while keeping the aspect ratio
 	setHeight = (heightDouble / width) * setWidth;
 
-    // check supplied width and height
-	/*
-    if(width < ARGS_MINIMUM_WIDTH)
-        width = 800;
-    if(height < ARGS_MINIMUM_HEIGHT)
-        height = 600;
-	*/
-
-	width = 800;
-	height = 600;
+	width = setWidth;
+	height = setHeight;
     // TODO set width and height for aspect ratio here
     // in main.c there is a function call to create_gdal_image, that creates
     // a struct with data on the width and height of the image
