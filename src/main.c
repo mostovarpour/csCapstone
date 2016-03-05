@@ -30,7 +30,6 @@ int main(int argc, char** argv)
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
     glfwGetWindowSize(window, &screen_width, &screen_height);
 
-	//init_glfw(&window, screen_width, screen_height); //HERE IT IS!!!!
     // Setup shaders
     //TODO give this function a better name
     setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program, screen_height);
