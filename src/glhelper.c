@@ -36,8 +36,8 @@ void init_glfw(ptGLFWwindow window, int width, int height)
         height = 600;
 	*/
 
-	width = setWidth;
-	height = setHeight;
+	width = 800;
+	height = 600;
     // TODO set width and height for aspect ratio here
     // in main.c there is a function call to create_gdal_image, that creates
     // a struct with data on the width and height of the image
