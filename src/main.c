@@ -21,10 +21,10 @@ int main(int argc, char** argv)
 	GLuint vertex_attribute_obj, element_buffer, vertex_buffer, v_shader, f_shader, shader_program
 		, *texture_buffer = (GLuint*)malloc(sizeof(GLuint) * image->band_count);
 	// Initialize parameters for init_glfw
-	int picHeight = GDALGetRasterXSize(image->dataset);
-	int picWidth = GDALGetRasterYSize(image->dataset);
+	int picHeight = image->original_height;
+	int picWidth = image->original_width;
     // initialize openGL
-    init_glfw(&window, screen_width, screen_height);
+    init_glfw(&window, picHeight, picWidth);
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
