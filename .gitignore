@@ -9,3 +9,4 @@ build/
 *.suo
 *.filters
 .ycm*
+*.opendb
