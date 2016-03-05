@@ -1,1 +1,13 @@
-With the continued advances in space exploration the need to efficiently process the large quantity of data that is received from space. One important piece of data is large pictures of other planets, usually gigapixels in size. The current method of viewing these images is by building pyramids which can often take more than eight hours. We plan on allowing researchers to quickly view these images with a stochastic sampling algorithm which would give them the ability to view these massive images in a manner of minutes instead of hours.
+With the continued advances in space exploration 
+the need to efficiently process the large quantity 
+of data that is received from space continues to 
+grow exponentially. One important piece of data is 
+the extremely large pictures of other planets, 
+usually gigapixels in size. The current method of 
+viewing these images is by building pyramids which 
+can often take more than eight hours. We plan on 
+providing researchers with a tool that will allow 
+them to quickly view these images 
+with a stochastic sampling algorithm.This would 
+give them the ability to view these massive images 
+in a manner of minutes instead of hours.
