@@ -1,0 +1,42 @@
+In the pyramids slide:
+    Explain why they are not simply just rendering the top level of the pyramid. It is because simply building the top level of the pyramid would not allow for functions in the viewer such as panning and zooming
+
+In the GDAL slide: 
+    Explain that GDAL is not assisting us but rather it is a requirement for the project. This is because everyone uses GDAL aka it is the standard
+
+In the Key requirements slide:
+    Get rid of single bullets
+    Algorithm: Talk about efficiency, correctness
+    Viewer: Break up the pan and zoom into multiple bullet points
+    Non functional viewer: Highly responsive
+
+Technology stack:
+    Shift glfw3 
+    Make OpenGL an L instead of a T
+    Make blocks same size
+
+The Algorithm slide:
+    Get rid of single bullet points
+    Possibly delete the a. and have that as a comment underneath instead
+
+Introduce a slide that has either psuedo code or psuedo math
+
+Image Viewer Slide
+    Cache using pyramids 
+
+BGFX SLIDE
+    Rename it to implementation challenges
+    Tell the tale of the problem with modern graphics
+    Talk about how in windows you have directx and linux you have opengl
+    Might be problems with windows
+
+Image Viewer
+    Do a mockup of the toolbar and talk about how the bottom part of the window is working and the top is a mockup
+
+Challenges 
+    Talk about quality loss but never quantify what the quality loss is
+
+Conclusion
+    Summarize
+    Palmer enjoys having a graphic on the conclusion slide
+    Bullets on left and image on right
