@@ -37,3 +37,45 @@ void init_glfw(ptGLFWwindow window, int width, int height)
     }
     glfwMakeContextCurrent(*window);
 }
+
+/*
+ *GLuint png_texture_load(const char * file_name, int * width, int * height)
+ *{
+ *    png_byte header[8];
+ *
+ *    FILE *fp = fopen(file_name, "rb");
+ *    if (fp == 0)
+ *    {
+ *        perror(file_name);
+ *        return 0;
+ *    }
+ *
+ *    // read the header
+ *    fread(header, 1, 8, fp);
+ *
+ *    if (png_sig_cmp(header, 0, 8))
+ *    {
+ *        fprintf(stderr, "error: %s is not a PNG.\n", file_name);
+ *        fclose(fp);
+ *        return 0;
+ *    }
+ *
+ *    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+ *    if (!png_ptr)
+ *    {
+ *        fprintf(stderr, "error: png_create_read_struct returned 0.\n");
+ *        fclose(fp);
+ *        return 0;
+ *    }
+ *
+ *    // create png info struct
+ *    png_infop info_ptr = png_create_info_struct(png_ptr);
+ *    if (!info_ptr)
+ *    {
+ *        fprintf(stderr, "error: png_create_info_struct returned 0.\n");
+ *        png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+ *        fclose(fp);
+ *        return 0;
+ *    }
+ *}
+ */
