@@ -8,7 +8,7 @@ ifeq ($(OS), Darwin)
 	LIBS=glfw3 gdal GLEW pthread 
 	MACLINK= -framework OpenGL
 else
-	LIBS=glfw3 gdal GLEW GLU GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama libpng
+	LIBS=glfw3 gdal GLEW GLU GL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama 
 endif
 LINK=$(foreach lib, $(LIBS), -l$(lib))
 
