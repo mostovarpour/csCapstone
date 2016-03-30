@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-#include <GDAL/gdal.h>
-#include <GDAL/cpl_conv.h> /* for CPLMalloc() */
+#include <gdal.h>
+#include <cpl_conv.h> /* for CPLMalloc() */
 #include "errcheck.h"
 #include "threads.h"
 
