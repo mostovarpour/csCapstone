@@ -19,6 +19,7 @@ before_install:
     - sudo add-apt-repository  ppa:george-edison55/cmake-3.x
     - sudo apt-get install -qq cmake xorg-dev libgl1-mesa-dev
     - sudo apt-get install --only-upgrade cmake -qq
+    - sudo apt-get install libdevil-dev libdevil1c2 libpng libjpeg -qq
     # Build glfw3
     - wget https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.zip
     - unzip glfw-3.1.2.zip
@@ -35,6 +36,7 @@ before_install:
     - cd gdal-2.0.2
     - ./configure --includedir=/usr/local/include/GDAL && make && sudo make install
     - cd ..
+    #Get DevIL
 
 script:
     - cd src
