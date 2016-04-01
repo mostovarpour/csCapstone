@@ -4,7 +4,7 @@ void error_callback(int error, const char* description) {
     printf("Error %d: %s\n", error, description);
 }
 
-void init_glfw(ptGLFWwindow window, int width, int height)
+void init_glfw(ptGLFWwindow window, int winWidth, int winHeight, int picWidth, int picHeight)
 {
     // set error callback
     glfwSetErrorCallback(error_callback);
@@ -24,12 +24,12 @@ void init_glfw(ptGLFWwindow window, int width, int height)
 	int setHeight;
 
 	//One of the values has to be converted to a double in order to recieve a decimal value answer for the following division equation
-	double heightDouble = height;
-	//This is a standard formula for resizing an image while keeping the aspect ratio
-	setHeight = ((heightDouble / width) * setWidth) + 50;
+	double heightDouble = picHeight;
+	//This is a standard formula for resizing an image while keeping the aspect ratio. plus 50 pixels for the toolbar
+	setHeight = ((heightDouble / picWidth) * setWidth) + 50;
 
-	width = setWidth;
-	height = setHeight;
+	winWidth = setWidth;
+	winHeight = setHeight;
     // TODO set width and height for aspect ratio here
     // in main.c there is a function call to create_gdal_image, that creates
     // a struct with data on the width and height of the image
@@ -37,7 +37,7 @@ void init_glfw(ptGLFWwindow window, int width, int height)
     // which creates the window.
     
     // get screen size
-    *window = glfwCreateWindow(width, height, "Gigapixel Viewer", NULL, NULL);
+    *window = glfwCreateWindow(winWidth, winHeight, "Gigapixel Viewer", NULL, NULL);
     if(!*window) 
     {
         glfwTerminate();

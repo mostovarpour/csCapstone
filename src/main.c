@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	int picHeight = image->original_height;
 	int picWidth = image->original_width;
     // initialize openGL
-    init_glfw(&window, picWidth, picHeight);
+    init_glfw(&window, screen_width, screen_height, picWidth, picHeight);
     // setup glew for most recent openGL functions
     glewExperimental = GL_TRUE;
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
