@@ -30,6 +30,7 @@ int main(int argc, char** argv)
     glewInit(); // gets cool functions like glGenVertexArrays and glBindBuffer
     glfwGetWindowSize(window, &screen_width, &screen_height);
 
+
     // Setup shaders
     //TODO give this function a better name
     setup_polygons(&vertex_attribute_obj, &element_buffer, &vertex_buffer, &v_shader, &f_shader, &shader_program, screen_height);
@@ -38,6 +39,8 @@ int main(int argc, char** argv)
     // main loop
     while(!glfwWindowShouldClose(window))
     {
+		glScalef(500.0, 500.0, 100.0);
+
         // Update the window size
         glfwGetWindowSize(window, &screen_width, &screen_height);
         // Resample the texture
@@ -52,6 +55,12 @@ int main(int argc, char** argv)
         glfwSwapBuffers(window); // swap buffers (like vsync)
         // GFLW window manager function
         glfwPollEvents();
+
+		glZoom(window, picWidth, picHeight);
+
+		
+
+
     }
     // Free the window
     glfwDestroyWindow(window);
