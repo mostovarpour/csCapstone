@@ -9,6 +9,7 @@
 #include "raster.h"
 #include "args.h"
 #include "toolbar.h"
+
 GLFWwindow *window;
 Mutex resource_mutex;
 int *button_width = NULL, *button_height = NULL;
@@ -37,7 +38,8 @@ void display()
     glTexCoord2i(1, 0); glVertex2i(width, 0);
     glEnd();
 
-    glutSwapBuffers();
+    /*glutSwapBuffers();*/
+    glfwSwapBuffers(window);
 } 
 
 /* Handler for window re-size event. Called back when the window first appears and
@@ -51,7 +53,7 @@ void reshape(GLsizei newwidth, GLsizei newheight)
     glOrtho(0.0, width, height, 0.0, 0.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
-    glutPostRedisplay();
+    /*glutPostRedisplay();*/
 }
 
 
@@ -102,27 +104,6 @@ int LoadImage(char *filename)
 
 int main(int argc, char** argv)
 {
-    GLuint texid;
-    int    picImage;
-
-    if ( argc < 1)
-    {
-        /* no image file to  display */
-        return -1;
-    }
-
-    /* GLUT init */
-    glutInit(&argc, argv);            // Initialize GLUT
-    glutInitDisplayMode(GLUT_DOUBLE); // Enable double buffered mode
-    glutInitWindowSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);   // Set the window's initial width & height
-    //TODO Using TODO to mark this as something that I just changed
-    //glutCreateWindow(argv[0]);      // Create window with the name of the executable
-    glutDisplayFunc(display);       // Register callback handler for window re-paint event
-    glutReshapeFunc(reshape);       // Register callback handler for window re-size event
-
-    /* OpenGL 2D generic init */
-    /*initGL(DEFAULT_WIDTH, DEFAULT_HEIGHT);*/
-
     /* Initialization of DevIL */
     if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
     {
@@ -130,36 +111,23 @@ int main(int argc, char** argv)
         return -1;
     }
     ilInit(); 
+    /*iluInit();*/
 
-
-    /* load the file picture with DevIL */
-    picImage = LoadImage(argv[2]);
-    /*picImage = LoadImage("../utilityIcons/panLeft.jpg");*/
-    printf("%s\n", picImage);
-    if ( picImage == -1 )
-    {
-        printf("Can't load picture file %s by DevIL \n", argv[2]);
-        return -1;
-    }
-
-    /* OpenGL texture binding of the image loaded by DevIL  */
-    glGenTextures(1, &texid); /* Texture name generation */
-    glBindTexture(GL_TEXTURE_2D, texid); /* Binding of texture name */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear interpolation for magnification filter */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear interpolation for minifying filter */
-    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 
-            0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData()); /* Texture specification */
-
-    /*==============================================
-     * This is where the normal working stuff starts
-     *==============================================*/
-
-    /* Main loop */
-    glutMainLoop();
-
-    /* Delete used resources and quit */
-    //ilDeleteImages(1, &picImage); /* Because we have already copied image data into texture data we can release memory used by image. */
-    glDeleteTextures(1, &texid);
+    /*Setting up the pictures*/
+    ILuint texid;
+    /*ILboolean success;*/
+    GLuint picImage;
+    ilGenImages(1, &texid);
+    ilBindImage(texid);
+    ilLoadImage("../utilityIcons/panLeft.jpg");
+    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+    glGenTextures(1, &picImage);
+    glBindTexture(GL_TEXTURE_2D, picImage);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), 
+            ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 
+            0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
 
 
     // check parameters and update variables accordingly
@@ -193,21 +161,6 @@ int main(int argc, char** argv)
         glfwGetWindowSize(window, &screen_width, &screen_height);
         // Resample the texture
         setup_texture(window, image, texture_buffer, shader_program);
-        //Load the images for the toolbar
-        /*char* panUp = (int**)LoadImage("../utilityIcons/panUp.jpg");*/
-        printf("Debug1\n");
-        /*LoadImage("../utilityIcons/panDown.jpg");*/
-        /*printf("Debug2\n");*/
-        /*LoadImage("../utilityIcons/panLeft.jpg");*/
-        /*printf("Debug3\n");*/
-        /*LoadImage("../utilityIcons/panRight.jpg");*/
-        /*printf("Debug4\n");*/
-        /*LoadImage("../utilityIcons/zoomOut.jpg");*/
-        /*printf("Debug5\n");*/
-        /*LoadImage("../utilityIcons/zoomIn.jpg");*/
-        /*printf("Debug6\n");*/
-        /*display();*/
-
         // Set clear color to black
         glClearColor(0,0,0,1);
         // Wipe the screen buffer 
@@ -224,6 +177,11 @@ int main(int argc, char** argv)
     // cleanup
     // Delete the textures
     glDeleteTextures(image->band_count, texture_buffer);
+    
+    /* Delete used resources and quit */
+    ilDeleteImages(1, &texid); /* Because we have already copied image data into texture data we can release memory used by image. */
+    glDeleteTextures(1, &picImage);
+
     // Release band buffers, etc
     destroy_gdal_image(image);
     free(texture_buffer);
