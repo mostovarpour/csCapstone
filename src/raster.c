@@ -15,6 +15,7 @@ const char *vertex_shader =
 const char *fragment_shader =
 "#version 150\n"
 "uniform sampler2D tex[3];"
+/*"uniform sampler2D toolbar"*/
 "in vec2 TexCoord;"
 "out vec4 outColor;" // output a vec4 (r,g,b,a)
 "void main()"
