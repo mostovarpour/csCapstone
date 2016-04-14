@@ -111,7 +111,7 @@ thread_func fill_band(thread_arg params)
     GDALRasterIOExtraArg args;
     args.nVersion = RASTERIO_EXTRA_ARG_CURRENT_VERSION;
     args.eResampleAlg = GRIORA_Stochastic;
-    args.irandPixSampSize = 10;
+    args.irandPixSampSize = 3;
     args.bFloatingPointWindowValidity = FALSE;
     args.pfnProgress = NULL;
     args.pProgressData = NULL;
