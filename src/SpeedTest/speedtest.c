@@ -36,8 +36,8 @@ int main(int argc, char** argv)
     profileStochastic(numTests, filepath);
 
     profileNearestNeighbor(numTests, filepath);
-    profileDatasetIO(numTests, filepath);
-    profileDatasetIONN(numTests, filepath);
+    //profileDatasetIO(numTests, filepath);
+    //profileDatasetIONN(numTests, filepath);
 }
 
 void profileStochastic(int tests, char *filepath)
@@ -46,7 +46,7 @@ void profileStochastic(int tests, char *filepath)
     printf("Running stochastic alg %d times\n", tests);
     for(i = 0; i < tests; i++)
     {   
-        printf("Run %d: ", i);
+        //printf("Run %d: ", i);
         GDALDatasetH ds = GDALOpen(filepath, GA_ReadOnly);
         int bandCount = GDALGetRasterCount(ds);
         if(bandCount > 3)
@@ -79,7 +79,8 @@ void profileStochastic(int tests, char *filepath)
 
         gettimeofday(&endTime, NULL);
         timersub(&endTime, &startTime, &difference);
-        printf("Image sampled in %ld.%06ld\n", difference.tv_sec, difference.tv_usec);
+        //printf("Image sampled in %ld.%06ld\n", difference.tv_sec, difference.tv_usec);
+        printf("%ld.%06ld,", difference.tv_sec, difference.tv_usec);
         GDALClose(ds);
     }
 }
@@ -90,7 +91,7 @@ void profileNearestNeighbor(int tests, char *filepath)
     printf("Running nearest neighbor alg %d times\n", tests);
     for(i = 0; i < tests; i++)
     {   
-        printf("Run %d: ", i);
+        //printf("Run %d: ", i);
         GDALDatasetH ds = GDALOpen(filepath, GA_ReadOnly);
         int bandCount = GDALGetRasterCount(ds);
         if(bandCount > 3)
@@ -121,7 +122,8 @@ void profileNearestNeighbor(int tests, char *filepath)
 
         gettimeofday(&endTime, NULL);
         timersub(&endTime, &startTime, &difference);
-        printf("Image sampled in %ld.%06ld\n", difference.tv_sec, difference.tv_usec);
+        //printf("Image sampled in %ld.%06ld\n", difference.tv_sec, difference.tv_usec);
+        printf("%ld.%06ld,", difference.tv_sec, difference.tv_usec);
         GDALClose(ds);
     }   
 }
