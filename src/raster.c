@@ -116,14 +116,14 @@ void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint
     glEnableVertexAttribArray(texAttrib);
 }
 
-void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLuint shader)
+void ImageToTexture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLuint shader)
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    sample(image, width, height);
+    //sample(image, width, height, sampling_method);
     // if the image isn't ready then there's no point
-    if(!image->ready_to_upload)
-        return;
+    //if(!image->ready_to_upload)
+    //return;
     /*******************
      *TEXTURE STUFF YAY*
      *******************/
