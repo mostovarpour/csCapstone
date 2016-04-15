@@ -57,11 +57,11 @@ void print_file_information(GDALImage *image)
 ///Doesn't actually downsample, well, it does, but the magic happens in rasterio
 /// we may have to really get into GDAL to get the downsampling working the way we want it
 ///</summary>
-void downsample(GDALImage *image, int width, int height)
+void downsample(GDALImage *image, int width, int height, int method)
 {
     if(GDALGetRasterDataType(image->current_band) == GDT_Int16)
     {
-        puts("GDT_16");
+        puts("Unsupported type GDT_16");
         exit(EXIT_FAILURE);
     }
     else
@@ -89,6 +89,7 @@ void downsample(GDALImage *image, int width, int height)
             thread_parameters[i]->band = GDALGetRasterBand(image->dataset, i+1);
             thread_parameters[i]->is_sampling = &image->is_sampling[i];
             thread_parameters[i]->image = image;
+            thread_parameters[i]->method = method;
             image->is_sampling[i] = true;
         }
         // create a thread for reading the image
@@ -137,7 +138,7 @@ thread_func fill_band(thread_arg params)
     return 0;
 }
 
-void sample(GDALImage *image, int width, int height) 
+void sample(GDALImage *image, int width, int height, int method) 
 {
     // break if still not finished from last sampling
     // call
@@ -150,7 +151,7 @@ void sample(GDALImage *image, int width, int height)
     // otherwise if we're not sampling and ready to upload
     // break if the image hasn't yet been uploaded to the gpu.
     // don't want to overwrite the buffer yet
-    downsample(image, width, height);
+    downsample(image, width, height, method);
 
 }
 

@@ -42,14 +42,18 @@ int main(int argc, char** argv)
 
     // Initialize the mutex
     init_mutex(resource_mutex);
+    //ImageToTexture(window, image, texture_buffer, shader_program, GRIORA_Stochastic);
+    sample(image, screen_width, screen_height, GRIORA_Stochastic);
 
     // main loop
     while(!glfwWindowShouldClose(window))
     {
+        if(image->ready_to_upload)
+        {
+            ImageToTexture(window, image, texture_buffer, shader_program);
+        }
         // Update the window size
         glfwGetWindowSize(window, &screen_width, &screen_height);
-        // Resample the texture
-        setup_texture(window, image, texture_buffer, shader_program);
         // Set clear color to black
         glClearColor(0,0,0,1);
         // Wipe the screen buffer 
