@@ -27,6 +27,25 @@ const char *fragment_shader =
 "}"
 ;
 
+//The vertex shader for the toolbar
+const char *toolbar_vertex_shader = 
+"void main()"
+"{"
+"   vec4 a = gl_Vertex;"
+"   a.x = a.x * 0.5;"
+"   a.y = a.y * 0.5;"
+"   gl_Position = gl_ModelViewProjectionMatrix * a;"
+"}"
+;
+
+//The fragment shader for the toolbar
+const char *toolbar_fragment_shader = 
+"void main()"
+"{"
+"   gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);"
+"}"
+;
+
 // pass in pointers so we can free the memory in the gpu later
 void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint *vertex_buffer, GLuint *v_shader, GLuint *f_shader, GLuint *shader_program, int height) 
 {
@@ -119,7 +138,7 @@ void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint
 
 void setup_texture(GLFWwindow *window, GDALImage *image, GLuint *tex_buffer, GLuint shader)
 {
-    int width, height;
+    int width, height/*, toolbarWidth, toolbarHeight*/;
     glfwGetWindowSize(window, &width, &height);
     sample(image, width, height);
     // if the image isn't ready then there's no point

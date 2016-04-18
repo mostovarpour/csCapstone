@@ -5,6 +5,12 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
-int LoadImage(char *filename); 
-void display();
+#include <GLFW/glfw3.h>
+/*
+ *void display();
+ *void reshape (GLsizei newsizei, GLsizei newheight);
+ *void initGL (int w, int h);
+ *int LoadImage(char *filename); 
+ *int toolbarGo(int argc, char **argv);
+ */
 #endif

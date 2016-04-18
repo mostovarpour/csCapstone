@@ -8,14 +8,14 @@ ifeq ($(OS), Darwin)
 	LIBS=glfw3 gdal GLEW pthread 
 	MACLINK= -framework OpenGL
 else
-	LIBS=glfw3 gdal GLEW GLU GL IL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama png
+	LIBS=glfw3 gdal GLEW GLU GL glut IL X11 pthread dl m Xxf86vm Xrandr Xi Xcursor Xinerama png
 endif
 LINK=$(foreach lib, $(LIBS), -l$(lib))
 
 FILES=glhelper main gdalreader raster args
 
 all: clean setup compile
-	g++ $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
+	gcc $(foreach file, $(FILES), $(OBJDIR)/$(file).o ) -w -o $(BINDIR)/main $(LINK) $(MACLINK)
 
 setup:
 	mkdir -p $(BINDIR)
