@@ -158,13 +158,16 @@ int main(int argc, char** argv)
     /* load the file picture with DevIL */
     /*toolbarImage = LoadImage(argv[2]);*/
     /*toolbarImage = LoadImage("../utilityIcons/toolbar.jpg");*/
-    toolbarImage = LoadImage();
-    printf("%d\n", toolbarImage);
-    if ( toolbarImage == -1 )
-    {
-        printf("Can't load picture file %s by DevIL \n", argv[1]);
-        return -1;
-    }
+    ilLoadImage("../utilityIcons/toolbar.jpg");
+    /*
+     *toolbarImage = LoadImage();
+     *printf("%d\n", toolbarImage);
+     *if ( toolbarImage == -1 )
+     *{
+     *    printf("Can't load picture file %s by DevIL \n", argv[1]);
+     *    return -1;
+     *}
+     */
 
     /* OpenGL texture binding of the image loaded by DevIL  */
     glGenTextures(1, &texid); /* Texture name generation */
