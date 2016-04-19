@@ -31,12 +31,11 @@ void setup_polygons(GLuint *vertex_attribute_obj, GLuint *element_buffer, GLuint
 {
     glewInit();
     // calculate OpenGL point for 50px away from the top
-    float top = ((height / 2.0f - 50) / (height / 2.0f));
     // create vertices simple triangle
     float vertices[] = {
         //position     //texture coordinates
-        -1.0f,  top ,  0.0f, 0.0f, // top left 
-         1.0f,  top ,  1.0f, 0.0f, // top right
+        -1.0f,  1.0f ,  0.0f, 0.0f, // top left 
+         1.0f,  1.0f ,  1.0f, 0.0f, // top right
          1.0f, -1.0f,  1.0f, 1.0f, // bottom-right
         -1.0f, -1.0f,  0.0f, 1.0f  // bottom-left
     };
