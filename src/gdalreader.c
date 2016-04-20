@@ -57,7 +57,7 @@ void print_file_information(GDALImage *image)
 ///Doesn't actually downsample, well, it does, but the magic happens in rasterio
 /// we may have to really get into GDAL to get the downsampling working the way we want it
 ///</summary>
-void downsample(GDALImage *image, int width, int height, int method)
+void downsample(GDALImage *image, int width, int height, int method, int skipMult)
 {
     if(GDALGetRasterDataType(image->current_band) == GDT_Int16)
     {
@@ -90,6 +90,7 @@ void downsample(GDALImage *image, int width, int height, int method)
             thread_parameters[i]->is_sampling = &image->is_sampling[i];
             thread_parameters[i]->image = image;
             thread_parameters[i]->method = method;
+            thread_parameters[i]->skipMultiplier = skipMult;
             image->is_sampling[i] = true;
         }
         // create a thread for reading the image
@@ -110,12 +111,10 @@ thread_func fill_band(thread_arg params)
     width = GDALGetRasterBandXSize(in->band);
     height = GDALGetRasterBandYSize(in->band);
     GDALRasterIOExtraArg args;
-    args.nVersion = RASTERIO_EXTRA_ARG_CURRENT_VERSION;
-    args.eResampleAlg = GRIORA_Stochastic;
-    args.irandPixSampSize = 3;
-    args.bFloatingPointWindowValidity = FALSE;
-    args.pfnProgress = NULL;
-    args.pProgressData = NULL;
+    INIT_RASTERIO_EXTRA_ARG(args);
+    args.eResampleAlg = (GDALRIOResampleAlg)in->method;
+    args.irandPixSampSize = in->skipMultiplier;
+    args.fillInBlanks = 1;
 
     //GDALResult result = GDALRasterIO(in->band, GF_Read, 
     //         0, 0, width, height,
@@ -138,7 +137,7 @@ thread_func fill_band(thread_arg params)
     return 0;
 }
 
-void sample(GDALImage *image, int width, int height, int method) 
+void sample(GDALImage *image, int width, int height, int method, int skipMult) 
 {
     // break if still not finished from last sampling
     // call
@@ -151,7 +150,7 @@ void sample(GDALImage *image, int width, int height, int method)
     // otherwise if we're not sampling and ready to upload
     // break if the image hasn't yet been uploaded to the gpu.
     // don't want to overwrite the buffer yet
-    downsample(image, width, height, method);
+    downsample(image, width, height, method, skipMult);
 
 }
 

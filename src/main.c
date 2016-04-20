@@ -42,8 +42,9 @@ int main(int argc, char** argv)
 
     // Initialize the mutex
     init_mutex(resource_mutex);
+    int skipMult = 30;
     //ImageToTexture(window, image, texture_buffer, shader_program, GRIORA_Stochastic);
-    sample(image, screen_width, screen_height, GRIORA_Stochastic);
+    sample(image, screen_width, screen_height, GRIORA_Stochastic, skipMult);
 
     // main loop
     while(!glfwWindowShouldClose(window))
@@ -51,6 +52,8 @@ int main(int argc, char** argv)
         if(image->ready_to_upload)
         {
             ImageToTexture(window, image, texture_buffer, shader_program);
+            int skipParam = skipMult == 1 ? 1 : --skipMult;
+            sample(image, screen_width, screen_height, GRIORA_Stochastic, skipParam);
         }
         // Update the window size
         glfwGetWindowSize(window, &screen_width, &screen_height);
