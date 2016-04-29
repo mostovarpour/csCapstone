@@ -88,7 +88,7 @@ void profileStochastic(int tests, char *filepath)
 void profileNearestNeighbor(int tests, char *filepath)
 {
     int i;
-    printf("Running nearest neighbor alg %d times\n", tests);
+    printf("\nRunning nearest neighbor alg %d times\n", tests);
     for(i = 0; i < tests; i++)
     {   
         //printf("Run %d: ", i);
