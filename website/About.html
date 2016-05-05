@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/site.css" rel="stylesheet" />
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/pageloader.js"></script>
+    </head>
+    <body>
+        <div id="nav"></div>
+        <div class="container">
+            <div class="row">
+                <div id="content-header"></div>
+                <div class="col-md-9">
+                    <div id="team-content"></div>
+                </div>
+                <!--<div class="col-md-3 hidden-xs hidden-sm">
+                    <ul id="sidenav" class="nav nav-tabs nav-stacked">
+                        <li><a href="#theteam">The Team</a></li>
+                        <li><a href="#facultymentor">Mentor</a></li>
+                        <li><a href="#sponsor">Sponsor</a></li>
+                    </ul>
+                </div>-->
+            </div>
+        </div>
+        <div id="footer"></div>
+        <script>
+            $(document).ready(function () {
+                getNav();
+                getTeam();
+                getFooter();
+            });
+        </script>
+    </body>
+</html>

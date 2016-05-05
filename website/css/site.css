@@ -9,7 +9,11 @@ body {
     color: #666;
 }
 
-#jumbo-header {
-    color: white;
-    background-image: url("../images/mars.jpg");
+#bg-header {
+    margin-top: 10px;
+    width: 70%;
+}
+
+#sidenav li {
+    margin-top:10px;
 }

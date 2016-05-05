@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/site.css" rel="stylesheet" />
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/pageloader.js"></script>
+        <style>
+            #deliverables li {
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="nav"></div>
+        <div class="container">
+            <div class="row">
+                <h3>Deliverables</h3>
+                <ul id="deliverables" class="nav nav-tabs nav-stacked">
+                    <li>
+                        <a href="https://github.com/mostovarpour/csCapstone">Source</a>
+                        - Our github repository.
+                    </li>
+                    <li>
+                        <a href="documents/TeamStandards.pdf">Team Standards</a>
+                        - Roles and responsibilities.
+                    </li>
+                    <li>
+                        <a href="documents/Requirements.pdf">Requirements Document</a>
+                        - Document outlining the project and all the features we 
+                        planned to implement.
+                    </li>
+                    <li>
+                        <a href="documents/Gigapixel_Design_Doc.pdf">Design Document</a>
+                        - Overview of the system and implementation plan.
+                    </li>
+                    <li>
+                        <a href="documents/Capstone_Presentation.pdf">Final Presentation</a>
+                        - Final presentation that was presented at the Undergraduate Symposium.
+                    </li>
+                    <li>
+                        <a href="documents/TestPlan.pdf">Test Plan</a>
+                        - Overview of how we planned to test our product.
+                    </li>
+                    <li>
+                        <a href="documents/finalReport">Final Report</a>
+                        - Summary of all documentation.
+                    </li>
+                    <!--<li>
+                        <a href="#">Project Poster</a>
+                    </li>-->
+                </ul>
+            </div>
+        </div>
+        <div id="footer"></div>
+        <script>
+            $(document).ready(function () {
+                getNav();
+                getFooter();
+            });
+        </script>
+    </body>
+</html>

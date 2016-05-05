@@ -11,10 +11,46 @@
     <body>
         <div id="nav"></div>
         <div class="container">
-            <div id="content-header"></div>
-            <div id="team-content"></div>
-            <div id="project-content"></div>
+            <div class="row">
+                <div id="content-header"></div>
+                <div class="col-md-9">
+                    <div id="project-content"></div>
+                </div>
+                <div class="col-md-3 hidden-xs hidden-sm">
+                    <ul id="sidenav" class="nav nav-tabs nav-stacked" style="position: fixed;">
+                        <li><a href="#content-header">Top</a></li>
+                        <li><a href="#project-overview">Project Overview</a></li>
+                        <li><a href="#implementation-overview">Implementation Overview</a></li>
+                        <li><a href="#implementation">Implementation</a></li>
+                        <li><a href="#results">Results</a></li>
+                        <li><a href="#test1">Test 1</a></li>
+                        <li><a href="#test2">Test 2</a></li>
+                        <li><a href="#Viewer">Image Viewer</a></li>
+                        <li><a href="#conclusion">Conclusion</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <div id="footer"></div>
+        <script>
+            $(document).ready(function () {
+                getNav();
+                getHeader();
+                getProjectDetails();
+                getFooter();
+            });
+            
+            var sidenav = $("#sidenav");
+            var ttop = 374;
+            $(window).scroll(function () {
+                if(window.scrollY < 370) {
+                    console.log(ttop, window.scrollY);
+                    console.log((ttop - window.scrollY) + "px");
+                    sidenav.css({"top": (ttop - window.scrollY) + "px"})
+                } else {
+                    sidenav.css({"top": "10px"})
+                }
+            })
+        </script>
     </body>
 </html>
