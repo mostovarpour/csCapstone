@@ -54,6 +54,7 @@ struct thread_params
     int height;
     bool *is_sampling;
     int method;
+    int skipMultiplier;
 };
 
 ///<summary>
@@ -82,7 +83,7 @@ int limit_band_count(int BandCount);
 ///Calls the downsampling function
 ///or just returns if the image is already being sampled
 ///</summary>
-void sample(GDALImage *, int width, int height, int method);
+void sample(GDALImage *, int width, int height, int method, int skipMultiplier);
 void print_file_information(GDALImage *);
 // Requires that the filepath of GDALImage is already set
 void fill_image_data(GDALImage *);
